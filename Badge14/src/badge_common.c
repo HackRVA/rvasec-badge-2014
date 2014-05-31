@@ -86,7 +86,8 @@ void set_leds(unsigned char leds)
 void fill_buff(struct pix_buff *buff, unsigned char val)
 {
     unsigned int i;
-    for(i = 0; i < (buff->height>>3) * buff->width; i++)
+    unsigned int max = (buff->height>>3) * buff->width;
+    for(i = 0; i < max; i++)
         buff->pixels[i] = val;
 }
 

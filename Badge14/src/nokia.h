@@ -17,14 +17,17 @@
 
 unsigned int current_index;
 unsigned char X, Y;
-
+typedef enum {ALPHA, OPAQUE } BLIT_STYLE_t;
 void LCDString(char *characters) ;
 void LCDCharacter(char character) ;
 void LCDBitmap(const char my_array[]);
 void putPixel(unsigned char x, unsigned char y, unsigned char val);
 void gotoXY(int x, int y) ;
 void loop(void) ;
+void clear_screen_buff(void);
 void LCDClear(void) ;
+void LCDClearArea(unsigned char x, unsigned char y,
+                    unsigned char width, unsigned char height);
 void LCDInit(void) ;
 void LCDWrite(byte data_or_command, byte data) ;
 void setBuf(unsigned char val);
