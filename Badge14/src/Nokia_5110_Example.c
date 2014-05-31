@@ -280,6 +280,31 @@ void LCDBitmap(const char my_array[]){
     LCDWrite(LCD_DATA, my_array[index]);
 }
 
+void putPixel_toBuff(struct pix_buff *buff, 
+                     unsigned char x, unsigned char y,
+                     unsigned char pix_val)
+{
+  if (x > buff->width || y > buff->height) { return; }
+
+  // The LCD has 6 rows, with 8 pixels per  row.
+  // 'y_mod' is the row that the pixel is in.
+  // 'y_pix' is the pixel in that row we want to enable/disable
+  unsigned char y_mod = (y >> 3);	// >>3 divides by 8
+  unsigned char y_pix = (y-(y_mod << 3));// <<3 multiplies by 8
+  unsigned char val = 1 << y_pix;
+  unsigned int index = x + (y_mod*84);
+
+  gotoXY(x,y_mod);
+
+  if(pix_val)
+      buff->pixels[ index ] |=  val;
+      //LCDWrite (1, val | screen_buf[y_mod][x]);
+  else if(!ALPHA_ZERO)
+      buff->pixels[ x + (y_mod*84)] &= ((1 << y_pix) ^ 0xff);
+      //LCDWrite (1, ((1 << y_pix) ^ 0xff) & screen_buf[y_mod][x]);
+
+}
+
 void putPixel(unsigned char x, unsigned char y, unsigned char pix_val)
 {
   if (x > 84 || y > 48) { return; }
@@ -585,7 +610,7 @@ void LCDClear(void) {
 }
 
 //char gContrast=0xB0;
-char gContrast=180;
+char gContrast=185;
 //int gDelay=100;
 int gDelay=20;
 #define DELAY { int i; for (i=0; i<gDelay; i++) ; }
