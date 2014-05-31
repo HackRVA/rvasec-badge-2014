@@ -255,8 +255,6 @@ static const byte ASCII[][5] =
 {0x0,0x0,0x0,0x0,0x0}
 };
 
-
-
 static byte ALPHA_ZERO = 1;
 //screen is 6, 8 bit wide rows, with 84 columns
 static byte screen_buf[6][84];
@@ -595,6 +593,19 @@ void buffString(unsigned char x,
     }
 }
 
+void clear_screen_buff(void)
+{
+  unsigned char y, x;
+  //for (index = 0 ; index < (LCD_X * LCD_Y / 8) ; index++)
+  for (y = 0 ; y < 6 ; y++)
+  {
+      for( x =0; x < 84; x++)
+      {
+          screen_buf[y][x] = 0x00;
+      }
+  }
+}
+
 //Clears the LCD by writing zeros to the entire screen
 void LCDClear(void) {
   unsigned char y, x;
@@ -805,9 +816,11 @@ void blitBuff_toBuff(struct pix_buff *src_buff, struct pix_buff *dest_buff,
     
 }
 
+
 void blitBuff_opt(struct pix_buff* buff,
                   unsigned char x,
-                  unsigned char y)
+                  unsigned char y,
+                  BLIT_STYLE_t style)
 {
     unsigned char y_mod_start, y_pix_start, y_mod_end, y_pix_end;
     unsigned int base_y_start, base_y_end, sw_buff_i = 0;
@@ -825,18 +838,19 @@ void blitBuff_opt(struct pix_buff* buff,
 
     base_y_end = y_mod_end * buff->width;
 
-    unsigned char i = 0, j = 0, k = 0;
-    //push top part, special case?
-    //set cursor
-    //gotoXY(x, y_mod_start);
+    unsigned int i = 0, j = 0, k = 0;
 
     unsigned char shift_down = (y - (y_mod_start << 3));
     unsigned char shift_down_end = (y - (y_mod_end << 3));
+    unsigned char buff_mods = (buff->height >> 3) + 1;
+    y_mod_end = y_mod_start + buff_mods;
+    unsigned int sw_buff_i_end = buff_mods * buff->width;
     unsigned char temp_x = x;
     i = y_mod_start;
     if(!shift_down)
     {
-        for(sw_buff_i = 0; sw_buff_i < base_y_end ; sw_buff_i++)
+        //for(sw_buff_i = 0; sw_buff_i < base_y_end ; sw_buff_i++)
+        for(sw_buff_i = 0; sw_buff_i < sw_buff_i_end ; sw_buff_i++)
         {
            if(!(sw_buff_i % buff->width))
            {
@@ -845,36 +859,80 @@ void blitBuff_opt(struct pix_buff* buff,
                 temp_x = x;
            }
 
+           if(style == ALPHA)
             LCDWrite(LCD_DATA,
                 buff->pixels[sw_buff_i]
                | screen_buf[i - 1][temp_x++] );
+           else// if (style == OPAQUE)
+               LCDWrite(LCD_DATA,
+                buff->pixels[sw_buff_i]);
         }
     }
 
-    // if data pushed out of first row, or there is more to go
+    // -->if byte data is not aligned with the LCD byte rows,
+    //then every data byte is split across two LCD rows
+    // -->this would be much more simple if we based blit on the
+    // SW data, but this would require re-addressing the LCD
+    // cursor multiple times for each bytes in the buffer
     else
     {
         sw_buff_i = 0;//buff->width;
 
-        //should check if this cursor set is needed
+        //set LCD cursor to the right row
         gotoXY(x, i);
+        //reset x
         temp_x = x;
 
-        // go through the first row in the buffer
-        for(j = sw_buff_i , k = sw_buff_i + buff->width;
-                    j < sw_buff_i + buff->width; j++, k++)
+        // go through the first row in the buffer, it has to be split
+        // given the y value
+        for(j = sw_buff_i; j < sw_buff_i + buff->width; j++)
         {
             //push the row
-            LCDWrite(LCD_DATA,
-                   (buff->pixels[j] << shift_down)
-                    | screen_buf[i][temp_x++]);
+            if(style == ALPHA)
+                LCDWrite(LCD_DATA,
+                       (buff->pixels[j] << shift_down)
+                        | screen_buf[i][temp_x++]);
+            else
+                LCDWrite(LCD_DATA,
+                       (buff->pixels[j] << shift_down));
         }
 
+        // reset SW buff, since first SW byte row is only partially blit
         sw_buff_i = 0;
 
-        //i is y byte on LCD screen
-        for (i = y_mod_start+1; i <= y_mod_end; i++)
+        //enter loop if buffer will span more than two LCD rows
+        // -> if so, this should write out the middle portions
+        for (i = y_mod_start+1; i < y_mod_end; i++)
         {
+            //go to the next row
+            gotoXY(x, i);
+            temp_x = x;
+
+            // go through the first row in the buffer
+            for(j = sw_buff_i , k = sw_buff_i + buff->width;
+                        j < sw_buff_i + buff->width; j++, k++)
+            {
+//                //push the row
+                if(style == ALPHA)
+                    LCDWrite(LCD_DATA,
+                           (buff->pixels[j] >> 8 -shift_down)
+                          | (buff->pixels[k] << (shift_down))
+                          | screen_buf[i][temp_x++]  );
+                else
+                    LCDWrite(LCD_DATA,
+                           (buff->pixels[j] >> 8 -shift_down)
+                          | (buff->pixels[k] << (shift_down)));
+            }
+
+            sw_buff_i += buff->width;
+        }
+
+        //blit last row byte
+        if(y_mod_start != y_mod_end)
+        {
+            //reset to the last row in the buffer
+            sw_buff_i = ((buff->height >> 3 )) * buff->width;
+            i = y_mod_end;
             //should check if this cursor set is needed
             gotoXY(x, i);
             temp_x = x;
@@ -884,15 +942,30 @@ void blitBuff_opt(struct pix_buff* buff,
                         j < sw_buff_i + buff->width; j++, k++)
             {
                 //push the row
-                LCDWrite(LCD_DATA,
-                       (buff->pixels[j] >> 8 -shift_down)
-                      | (buff->pixels[k] << (shift_down))
-                      | screen_buf[i][temp_x++]  );
-            }
+                if(style == ALPHA)
+                    LCDWrite(LCD_DATA,
+                           (buff->pixels[j] >> 8 -shift_down)
+      //                    | (buff->pixels[k] << (shift_down))
+                            //(buff->pixels[j] << (shift_down))
+                          | screen_buf[i][temp_x++]  );
+                else
+                    LCDWrite(LCD_DATA,
+                           (buff->pixels[j] >> 8 -shift_down));
 
-            sw_buff_i += buff->width;
-        }      
+            }
+        }
     }
+    
+}
+
+
+void blitBuff_new(struct pix_buff* buff,
+                  unsigned char x,
+                  unsigned char y)
+{
+    //go through each byte in buffer
+
+    //
 }
 
 //this blit needs to be smarter and utilize the LCD auto increment
