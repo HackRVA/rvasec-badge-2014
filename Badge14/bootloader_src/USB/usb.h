@@ -108,7 +108,7 @@ Description:
 // *****************************************************************************
 
 #include "GenericTypeDefs.h"
-#include "Compiler.h"
+#include "../Compiler.h"
 
 #include "usb_config.h"             // Must be defined by the application
 

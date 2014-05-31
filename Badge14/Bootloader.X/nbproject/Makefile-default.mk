@@ -44,18 +44,12 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 # Distribution Directory
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
-# Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../bootloader_src/BootLoader.c ../bootloader_src/NVMem.c ../bootloader_src/FrameWork/Framework.c ../bootloader_src/TransportLayer/Usb_HID_tasks.c ../bootloader_src/TransportLayer/usb_descriptors.c ../bootloader_src/USB/usb_device.c ../bootloader_src/USB/usb_function_hid.c
-
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1192809561/BootLoader.o ${OBJECTDIR}/_ext/1192809561/NVMem.o ${OBJECTDIR}/_ext/502316088/Framework.o ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o ${OBJECTDIR}/_ext/1416911186/usb_device.o ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1192809561/BootLoader.o.d ${OBJECTDIR}/_ext/1192809561/NVMem.o.d ${OBJECTDIR}/_ext/502316088/Framework.o.d ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d ${OBJECTDIR}/_ext/1416911186/usb_device.o.d ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/502316088/Framework.o ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o ${OBJECTDIR}/_ext/1416911186/usb_device.o ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o ${OBJECTDIR}/_ext/1192809561/BootLoader.o ${OBJECTDIR}/_ext/1192809561/NVMem.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/502316088/Framework.o.d ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d ${OBJECTDIR}/_ext/1416911186/usb_device.o.d ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d ${OBJECTDIR}/_ext/1192809561/BootLoader.o.d ${OBJECTDIR}/_ext/1192809561/NVMem.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1192809561/BootLoader.o ${OBJECTDIR}/_ext/1192809561/NVMem.o ${OBJECTDIR}/_ext/502316088/Framework.o ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o ${OBJECTDIR}/_ext/1416911186/usb_device.o ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o
-
-# Source Files
-SOURCEFILES=../bootloader_src/BootLoader.c ../bootloader_src/NVMem.c ../bootloader_src/FrameWork/Framework.c ../bootloader_src/TransportLayer/Usb_HID_tasks.c ../bootloader_src/TransportLayer/usb_descriptors.c ../bootloader_src/USB/usb_device.c ../bootloader_src/USB/usb_function_hid.c
+OBJECTFILES=${OBJECTDIR}/_ext/502316088/Framework.o ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o ${OBJECTDIR}/_ext/1416911186/usb_device.o ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o ${OBJECTDIR}/_ext/1192809561/BootLoader.o ${OBJECTDIR}/_ext/1192809561/NVMem.o
 
 
 CFLAGS=
@@ -91,90 +85,76 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/_ext/1192809561/BootLoader.o: ../bootloader_src/BootLoader.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1192809561 
-	@${RM} ${OBJECTDIR}/_ext/1192809561/BootLoader.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1192809561/BootLoader.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1192809561/BootLoader.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1192809561/BootLoader.o.d" -o ${OBJECTDIR}/_ext/1192809561/BootLoader.o ../bootloader_src/BootLoader.c   
-	
-${OBJECTDIR}/_ext/1192809561/NVMem.o: ../bootloader_src/NVMem.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1192809561 
-	@${RM} ${OBJECTDIR}/_ext/1192809561/NVMem.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1192809561/NVMem.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1192809561/NVMem.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1192809561/NVMem.o.d" -o ${OBJECTDIR}/_ext/1192809561/NVMem.o ../bootloader_src/NVMem.c   
-	
 ${OBJECTDIR}/_ext/502316088/Framework.o: ../bootloader_src/FrameWork/Framework.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/502316088 
 	@${RM} ${OBJECTDIR}/_ext/502316088/Framework.o.d 
-	@${RM} ${OBJECTDIR}/_ext/502316088/Framework.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/502316088/Framework.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/502316088/Framework.o.d" -o ${OBJECTDIR}/_ext/502316088/Framework.o ../bootloader_src/FrameWork/Framework.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/502316088/Framework.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/502316088/Framework.o.d" -o ${OBJECTDIR}/_ext/502316088/Framework.o ../bootloader_src/FrameWork/Framework.c   
 	
 ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o: ../bootloader_src/TransportLayer/Usb_HID_tasks.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1833100226 
 	@${RM} ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d" -o ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o ../bootloader_src/TransportLayer/Usb_HID_tasks.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d" -o ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o ../bootloader_src/TransportLayer/Usb_HID_tasks.c   
 	
 ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o: ../bootloader_src/TransportLayer/usb_descriptors.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1833100226 
 	@${RM} ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d" -o ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o ../bootloader_src/TransportLayer/usb_descriptors.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d" -o ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o ../bootloader_src/TransportLayer/usb_descriptors.c   
 	
 ${OBJECTDIR}/_ext/1416911186/usb_device.o: ../bootloader_src/USB/usb_device.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1416911186 
 	@${RM} ${OBJECTDIR}/_ext/1416911186/usb_device.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1416911186/usb_device.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1416911186/usb_device.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1416911186/usb_device.o.d" -o ${OBJECTDIR}/_ext/1416911186/usb_device.o ../bootloader_src/USB/usb_device.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1416911186/usb_device.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1416911186/usb_device.o.d" -o ${OBJECTDIR}/_ext/1416911186/usb_device.o ../bootloader_src/USB/usb_device.c   
 	
 ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o: ../bootloader_src/USB/usb_function_hid.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1416911186 
 	@${RM} ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d" -o ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o ../bootloader_src/USB/usb_function_hid.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d" -o ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o ../bootloader_src/USB/usb_function_hid.c   
+	
+${OBJECTDIR}/_ext/1192809561/BootLoader.o: ../bootloader_src/BootLoader.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1192809561 
+	@${RM} ${OBJECTDIR}/_ext/1192809561/BootLoader.o.d 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1192809561/BootLoader.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1192809561/BootLoader.o.d" -o ${OBJECTDIR}/_ext/1192809561/BootLoader.o ../bootloader_src/BootLoader.c   
+	
+${OBJECTDIR}/_ext/1192809561/NVMem.o: ../bootloader_src/NVMem.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1192809561 
+	@${RM} ${OBJECTDIR}/_ext/1192809561/NVMem.o.d 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1192809561/NVMem.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1192809561/NVMem.o.d" -o ${OBJECTDIR}/_ext/1192809561/NVMem.o ../bootloader_src/NVMem.c   
 	
 else
-${OBJECTDIR}/_ext/1192809561/BootLoader.o: ../bootloader_src/BootLoader.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1192809561 
-	@${RM} ${OBJECTDIR}/_ext/1192809561/BootLoader.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1192809561/BootLoader.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1192809561/BootLoader.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1192809561/BootLoader.o.d" -o ${OBJECTDIR}/_ext/1192809561/BootLoader.o ../bootloader_src/BootLoader.c   
-	
-${OBJECTDIR}/_ext/1192809561/NVMem.o: ../bootloader_src/NVMem.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} ${OBJECTDIR}/_ext/1192809561 
-	@${RM} ${OBJECTDIR}/_ext/1192809561/NVMem.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1192809561/NVMem.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1192809561/NVMem.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1192809561/NVMem.o.d" -o ${OBJECTDIR}/_ext/1192809561/NVMem.o ../bootloader_src/NVMem.c   
-	
 ${OBJECTDIR}/_ext/502316088/Framework.o: ../bootloader_src/FrameWork/Framework.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/502316088 
 	@${RM} ${OBJECTDIR}/_ext/502316088/Framework.o.d 
-	@${RM} ${OBJECTDIR}/_ext/502316088/Framework.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/502316088/Framework.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/502316088/Framework.o.d" -o ${OBJECTDIR}/_ext/502316088/Framework.o ../bootloader_src/FrameWork/Framework.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/502316088/Framework.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/502316088/Framework.o.d" -o ${OBJECTDIR}/_ext/502316088/Framework.o ../bootloader_src/FrameWork/Framework.c   
 	
 ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o: ../bootloader_src/TransportLayer/Usb_HID_tasks.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1833100226 
 	@${RM} ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d" -o ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o ../bootloader_src/TransportLayer/Usb_HID_tasks.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o.d" -o ${OBJECTDIR}/_ext/1833100226/Usb_HID_tasks.o ../bootloader_src/TransportLayer/Usb_HID_tasks.c   
 	
 ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o: ../bootloader_src/TransportLayer/usb_descriptors.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1833100226 
 	@${RM} ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d" -o ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o ../bootloader_src/TransportLayer/usb_descriptors.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1833100226/usb_descriptors.o.d" -o ${OBJECTDIR}/_ext/1833100226/usb_descriptors.o ../bootloader_src/TransportLayer/usb_descriptors.c   
 	
 ${OBJECTDIR}/_ext/1416911186/usb_device.o: ../bootloader_src/USB/usb_device.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1416911186 
 	@${RM} ${OBJECTDIR}/_ext/1416911186/usb_device.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1416911186/usb_device.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1416911186/usb_device.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1416911186/usb_device.o.d" -o ${OBJECTDIR}/_ext/1416911186/usb_device.o ../bootloader_src/USB/usb_device.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1416911186/usb_device.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1416911186/usb_device.o.d" -o ${OBJECTDIR}/_ext/1416911186/usb_device.o ../bootloader_src/USB/usb_device.c   
 	
 ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o: ../bootloader_src/USB/usb_function_hid.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1416911186 
 	@${RM} ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d" -o ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o ../bootloader_src/USB/usb_function_hid.c   
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1416911186/usb_function_hid.o.d" -o ${OBJECTDIR}/_ext/1416911186/usb_function_hid.o ../bootloader_src/USB/usb_function_hid.c   
+	
+${OBJECTDIR}/_ext/1192809561/BootLoader.o: ../bootloader_src/BootLoader.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1192809561 
+	@${RM} ${OBJECTDIR}/_ext/1192809561/BootLoader.o.d 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1192809561/BootLoader.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1192809561/BootLoader.o.d" -o ${OBJECTDIR}/_ext/1192809561/BootLoader.o ../bootloader_src/BootLoader.c   
+	
+${OBJECTDIR}/_ext/1192809561/NVMem.o: ../bootloader_src/NVMem.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1192809561 
+	@${RM} ${OBJECTDIR}/_ext/1192809561/NVMem.o.d 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1192809561/NVMem.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DTRANSPORT_LAYER_USB -DDEMO_BOARD_USB_STARTER_KIT -I"/home/morgan/Storage/A/Projects/Badge-14/RVAsecBadge14.git/rvasec-badge-2014/Badge14/bootloader_src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1192809561/NVMem.o.d" -o ${OBJECTDIR}/_ext/1192809561/NVMem.o ../bootloader_src/NVMem.c   
 	
 endif
 
@@ -189,12 +169,12 @@ endif
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
 dist/${CND_CONF}/${IMAGE_TYPE}/Bootloader.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    ../bootloader_src/btl_32MX250F128D_generic.ld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -mdebugger -D__MPLAB_DEBUGGER_PK3=1 -mprocessor=$(MP_PROCESSOR_OPTION)  -o dist/${CND_CONF}/${IMAGE_TYPE}/Bootloader.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}           -mreserve=data@0x0:0x1FC -mreserve=boot@0x1FC00490:0x1FC00BEF -mreserve=boot@0x1FC00490:0x1FC00BEF  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -mdebugger -D__MPLAB_DEBUGGER_PK3=1 -mprocessor=$(MP_PROCESSOR_OPTION) -mips16 -o dist/${CND_CONF}/${IMAGE_TYPE}/Bootloader.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__ICD2RAM=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,--gc-sections,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"
 	
 else
 dist/${CND_CONF}/${IMAGE_TYPE}/Bootloader.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   ../bootloader_src/btl_32MX250F128D_generic.ld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
-	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION)  -o dist/${CND_CONF}/${IMAGE_TYPE}/Bootloader.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"
+	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION) -mips16 -o dist/${CND_CONF}/${IMAGE_TYPE}/Bootloader.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--gc-sections,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map"
 	${MP_CC_DIR}/xc32-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/Bootloader.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} 
 endif
 

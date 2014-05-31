@@ -37,11 +37,11 @@
  *
  **********************************************************************/
 
-#include "GenericTypeDefs.h"
-#include "HardwareProfile.h"
-#include "Include/BootLoader.h"
-#include "Include/Framework/Framework.h"
-#include "Include/NVMem.h"
+#include "../Include/GenericTypeDefs.h"
+#include "../Include/HardwareProfile/HardwareProfile.h"
+#include "../Include/BootLoader.h"
+#include "../Include/Framework/Framework.h"
+#include "../Include/NVMem.h"
 #include  <string.h>
 #include <plib.h>
 

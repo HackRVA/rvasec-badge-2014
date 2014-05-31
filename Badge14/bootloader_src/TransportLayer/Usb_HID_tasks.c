@@ -42,7 +42,7 @@
 
 
 #include "./USB/usb.h"
-#include "HardwareProfile.h"
+#include "../HardwareProfile/HardwareProfile.h"
 #include "./USB/usb_function_hid.h"
 
 #include "Include/BootLoader.h"
