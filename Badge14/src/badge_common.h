@@ -11,6 +11,7 @@
 //#include "Compiler.h"
 //#include "HardwareProfile.h"
 
+//#define byte unsigned char
 enum BLIT_STYLE {ZERO_ERASES, ZERO_ALPHA};
 struct pix_buff
 {
@@ -26,6 +27,24 @@ struct coord
 {
     unsigned char x, y;
 };
+
+typedef struct coreVars {
+   unsigned char mtimerL;
+   unsigned char mtimerH;
+   unsigned char mtimerH2;
+} coreVars ;
+
+typedef struct coreBlock {
+   unsigned char block[16];
+} coreBlock ;
+
+typedef union coreMemory {
+   coreVars cV;
+   coreBlock cB;
+} coreMemory;
+coreMemory core;
+
+
 
 void b_strcpy(char* dest, const char* src);
 void intTime_to_charTime(char* c_time, unsigned int i_time);

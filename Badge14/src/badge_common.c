@@ -1,6 +1,8 @@
 #include "badge_common.h"
 #include "Common/Compiler.h"
 
+
+
 char do_BTM_CapTouch_Right() {
 
     register char s0, s1, s2, s3, s4, s5, s6, s7;
