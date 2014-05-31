@@ -1,0 +1,45 @@
+libusb_1_0_la-threads_posix.lo: os/threads_posix.c os/threads_posix.h \
+ /usr/include/pthread.h /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h /usr/include/endian.h \
+ /usr/include/bits/endian.h /usr/include/sched.h \
+ /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+ /usr/lib/gcc/x86_64-redhat-linux/4.6.3/include/stddef.h \
+ /usr/include/time.h /usr/include/bits/sched.h /usr/include/bits/time.h \
+ /usr/include/bits/pthreadtypes.h /usr/include/bits/setjmp.h
+
+os/threads_posix.h:
+
+/usr/include/pthread.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/sched.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/lib/gcc/x86_64-redhat-linux/4.6.3/include/stddef.h:
+
+/usr/include/time.h:
+
+/usr/include/bits/sched.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/bits/setjmp.h:

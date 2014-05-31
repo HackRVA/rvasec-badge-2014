@@ -14,7 +14,7 @@ struct Conference_Event
     char title[128];
     //char description[256];
 };
-#define NUM_EVENTS 20
+#define NUM_EVENTS 21
 struct Conference_Event conf_events[NUM_EVENTS];
 void initConferenceEvents()
 {

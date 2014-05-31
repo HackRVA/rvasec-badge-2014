@@ -1,0 +1,42 @@
+pic32usb1388 -v1.0- by Michele Costantino - PIC32 programmer for the Microchip AN1388 USB HID Bootloader
+Copyright (C) 2013  Michele Costantino
+
+This program is entirely based on pic32prog by Serge Vakulenko and it represents a modified version of a small part of it
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Release notes:
+ 
+18/11/2013 - V1.0 - Initial release
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Description
+
+The program requires your PIC32 board to be running the Microchip AN1388 USB HID Bootloader and takes in input your .hex file
+which should have been compiled using a linker script written under the definitions contained in the same Microchip AN1388 application note.
+
+The program runs under Linux and requires the following packages to be installed: libusb-dev, libusb-1.0-0-dev
+It was compiled using Codeblocks using the following settings: Projects->Build Options->Linker Setting-> add link libraries:usb-1.0 and pthread
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Usage : pic32usb1388 [input.hex]
+
+where:
+	"input.hex" is the .hex file to be programmed in the PIC32 flash me
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

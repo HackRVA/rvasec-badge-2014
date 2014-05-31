@@ -514,7 +514,7 @@ void* touchCalibrate(struct BadgeState *b_state)
         b_state->big_counter
             = b_state->counter_1
             = b_state->counter_2 = 0;
-        b_state->state_handler = menu_maker; //main_menu;//welcome;
+        b_state->state_handler = menu_maker;//main_menu;//welcome;
     }
 }
 
@@ -829,7 +829,6 @@ void* menu_maker(struct BadgeState *b_state)
             else if(i == current_menu->selected)
 
             {
-
                 invertBuffArea(loc.x + 1 ,
                                 loc.y + 1,
                                  t_x - 3,
