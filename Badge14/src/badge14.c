@@ -4,7 +4,10 @@
 
 extern char gContrast;
 unsigned char pix[504] = {0};
-struct pix_buff main_buff;
+
+struct pix_buff main_buff, bird_idle_buff;
+
+
 
 void initTouchState(struct TouchState *t_state)
 {
@@ -78,7 +81,20 @@ char set_backlight[] = "BACKLIGHT",
 
 char go_back[] = "<-[BACK]";
 //main_page.entries;
-struct BadgeState snake_state, sketch_state, manual_contrast_state;
+struct BadgeState snake_state, sketch_state, manual_contrast_state,
+                    bird_state;
+
+void initGFX(void)
+{
+    main_buff.pixels = pix;
+    main_buff.height = 48;
+    main_buff.width = 84;
+
+    bird_idle_buff.pixels = bird_idle;
+    bird_idle_buff.height = 11;
+    bird_idle_buff.width = 15;
+
+}
 
 void setupMenus(void)
 {
@@ -94,6 +110,10 @@ void setupMenus(void)
     initBadgeState(&snake_state);
         snake_state.state_handler = snake;
         snake_state.next_state = &snake_state;
+
+    initBadgeState(&bird_state);
+        bird_state.state_handler = badgy_bird;
+        bird_state.next_state = &bird_state;
         
     current_menu = &main_page;
 
@@ -138,7 +158,7 @@ void setupMenus(void)
     game_entries[1] = &bird_e;
         bird_e.text = bird_txt;
         bird_e.menu_entry = 0;
-        bird_e.state_entry = 0;
+        bird_e.state_entry = &bird_state;
 
     game_entries[2] = &pong_e;
         pong_e.text = pong_txt;
@@ -185,6 +205,7 @@ struct BadgeState* Init_Game(void)
     //gContrast = 174;
     LCDInit();
     LCDClear();
+    initGFX();
     //LCD_RVASec_Logo();
     //LCDLogo();
     //LCD backlight on
@@ -205,9 +226,6 @@ struct BadgeState* Init_Game(void)
 
     start_state.slide_handler = autoSlide;
 
-    main_buff.pixels = pix;
-    main_buff.height = 48;
-    main_buff.width = 84;
 
     return (struct BadgeState *)&start_state;
 }
@@ -854,7 +872,6 @@ void* manual_contrast(struct BadgeState *b_state)
 {
     static struct pix_buff buff;
 
-
     static unsigned char leds = 0xff, x = 40, y  = 35, redraw = 0;
 
     //if(!b_state->counter_2++)
@@ -1036,7 +1053,6 @@ void* snake(struct BadgeState *b_state)
     static struct CoOrd food;
     static struct SnakeSeg head;
     static struct pix_buff buff;
-    static char swipe;
 
     b_state->slide_handler(&b_state->slide_states);
 
@@ -1071,7 +1087,6 @@ void* snake(struct BadgeState *b_state)
     {
         LCDClear();
         b_state->next_state = b_state;
-        b_state->buff.pixels = pix;
 
         main_buff.pixels = pix;
         main_buff.width = 84;
@@ -1097,7 +1112,7 @@ void* snake(struct BadgeState *b_state)
     }
 
     //only update sometimes, game gets faster as snake gets bigger
-    if(b_state->big_counter > (SNAKE_RATE - (b_state->counter_1 << 7) ))
+    if(b_state->big_counter++ > (SNAKE_RATE - (b_state->counter_1 << 7) ))
     {
         LCDClear();
 
@@ -1188,9 +1203,56 @@ void* snake(struct BadgeState *b_state)
         }
         blitBuff_opt(&main_buff, 0, 0);
     }
-    
-    b_state->big_counter++;
+}
 
+#define BIRD_RATE 15000
+#define G_ACC 1
+void* badgy_bird(struct BadgeState *b_state)
+{
+    static unsigned char bird_y = 20;
+    static unsigned char bird_y_vel = 0;
+    
+
+    b_state->slide_handler(&b_state->slide_states);
+
+    //set_leds(b_state->slide_states.front.lower_loc);
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+
+    if(!b_state->counter_2)
+    {
+        //LCDClear();
+        b_state->next_state = b_state;
+
+        main_buff.pixels = pix;
+        main_buff.width = 84;
+        main_buff.height = 48;
+
+        b_state->counter_2 = 1;
+
+        //force update
+        b_state->big_counter = BIRD_RATE;
+
+        struct coord loc;
+
+        loc.x = 0;
+        loc.y = 0;
+        fill_buff(&main_buff, 0x00);
+
+        draw_square(&main_buff, loc, 83, 47);
+    }
+    if ( button_pressed == 250 )
+    {
+
+    }
+     if(b_state->big_counter++ > BIRD_RATE)
+     {
+
+        b_state->big_counter = 0;
+
+        blitBuff_opt(&main_buff, 0, 0);
+        blitBuff_opt(&bird_idle_buff, 20,20);
+     }
 }
 
 void* draw_schedule_ticker(struct BadgeState *b_state)

@@ -44,5 +44,7 @@ void writeXBM(const char *bm, unsigned bm_width, unsigned bm_height) ;
 #define LCD_X     84
 #define LCD_Y     48
 
+
+
 #endif	/* NOKIA_H */
 

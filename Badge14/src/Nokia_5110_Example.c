@@ -255,6 +255,8 @@ static const byte ASCII[][5] =
 {0x0,0x0,0x0,0x0,0x0}
 };
 
+
+
 static byte ALPHA_ZERO = 1;
 //screen is 6, 8 bit wide rows, with 84 columns
 static byte screen_buf[6][84];

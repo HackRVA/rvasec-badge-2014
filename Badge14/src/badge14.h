@@ -136,6 +136,7 @@ void Run_Game(struct BadgeState **state);
 
 void initQueue(struct Queue *queue);
 void updateQueue(struct Queue queue, void *item );
+void initGFX(void);
 
 void initTouchState(struct TouchState *t_state);
 void initBadgeState(struct BadgeState *b_state);
@@ -164,10 +165,53 @@ void* welcome(struct BadgeState *b_state);
 void* main_menu(struct BadgeState *b_state);
 void* menu_maker(struct BadgeState *b_state);
 void* manual_contrast(struct BadgeState *b_state);
+
 void* sliderPlay(struct BadgeState *b_state);
 void* snake(struct BadgeState *b_state);
+void* badgy_bird(struct BadgeState *b_state);
 void* tunnelFlight(struct BadgeState *b_state);
+
 void* debugStage(struct BadgeState *b_state);
 void printTouchVals(unsigned char btm, unsigned char side);
+
+static byte  bird_idle[] = {
+  /* width, height/8 */
+  //15,11/8,
+
+  /* rows 0-7 */
+  0x38,  /* col =  0 00111000 */
+  0xc4,  /* col =  1 11000100 */
+  0x84,  /* col =  2 10000100 */
+  0x86,  /* col =  3 10000110 */
+  0x8a,  /* col =  4 10001010 */
+  0x71,  /* col =  5 01110001 */
+  0x01,  /* col =  6 00000001 */
+  0x8f,  /* col =  7 10001111 */
+  0x51,  /* col =  8 01010001 */
+  0xa1,  /* col =  9 10100001 */
+  0xad,  /* col = 10 10101101 */
+  0xa2,  /* col = 11 10100010 */
+  0xbc,  /* col = 12 10111100 */
+  0xa0,  /* col = 13 10100000 */
+  0x40,  /* col = 14 01000000 */
+
+  /* rows 8-15 */
+  0x00,  /* col =  0 00000000 */
+  0x00,  /* col =  1 00000000 */
+  0x01,  /* col =  2 00000001 */
+  0x02,  /* col =  3 00000010 */
+  0x04,  /* col =  4 00000100 */
+  0x04,  /* col =  5 00000100 */
+  0x04,  /* col =  6 00000100 */
+  0x04,  /* col =  7 00000100 */
+  0x05,  /* col =  8 00000101 */
+  0x02,  /* col =  9 00000010 */
+  0x02,  /* col = 10 00000010 */
+  0x02,  /* col = 11 00000010 */
+  0x02,  /* col = 12 00000010 */
+  0x01,  /* col = 13 00000001 */
+  0x00,  /* col = 14 00000000 */
+
+};
 #endif	/* BADGE14_H */
 
