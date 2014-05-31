@@ -3,6 +3,8 @@
 #include "schedule.h"
 
 extern char gContrast;
+unsigned char pix[504] = {0};
+struct pix_buff main_buff;
 
 void initTouchState(struct TouchState *t_state)
 {
@@ -186,7 +188,7 @@ struct BadgeState* Init_Game(void)
     //LCD_RVASec_Logo();
     //LCDLogo();
     //LCD backlight on
-    LATBbits.LATB7 = 1;
+//    LATBbits.LATB7 = 1;
     button_pressed = button_cnt = button_used = 0;
     btm_size = side_size = 0;
 
@@ -202,6 +204,10 @@ struct BadgeState* Init_Game(void)
     start_state.state_handler = touchCalibrate;//main_menu;//tunnelFlight; // //
 
     start_state.slide_handler = autoSlide;
+
+    main_buff.pixels = pix;
+    main_buff.height = 48;
+    main_buff.width = 84;
 
     return (struct BadgeState *)&start_state;
 }
@@ -651,7 +657,6 @@ void* welcome(struct BadgeState *b_state)
     return 0;
 }
 
- unsigned char pix[504] = {0};
 void* tunnelFlight(struct BadgeState *b_state)
 {
     static struct pix_buff buff;
@@ -1024,11 +1029,13 @@ void* sliderPlay(struct BadgeState *b_state)
 }
 
 #define SNAKE_RATE 15000
+#define SNAKE_START_SIZE 5
 struct SnakeSeg snake_ll[200];
 void* snake(struct BadgeState *b_state)
 {
     static struct CoOrd food;
     static struct SnakeSeg head;
+    static struct pix_buff buff;
     static char swipe;
 
     b_state->slide_handler(&b_state->slide_states);
@@ -1062,8 +1069,14 @@ void* snake(struct BadgeState *b_state)
     unsigned char i = 0, j = 0;
     if(!b_state->counter_2)
     {
-        b_state->next_state = b_state;
         LCDClear();
+        b_state->next_state = b_state;
+        b_state->buff.pixels = pix;
+
+        main_buff.pixels = pix;
+        main_buff.width = 84;
+        main_buff.height = 48;
+        
         b_state->counter_2 = 1;
 
         //need to do random init here instead
@@ -1075,7 +1088,7 @@ void* snake(struct BadgeState *b_state)
         snake_ll[0].direction.xV = 1;
         snake_ll[0].direction.yV = 0;
 
-        for(i = 1; i < 5; i ++)
+        for(i = 1; i < SNAKE_START_SIZE; i ++)
         {
             snake_ll[i].location = snake_ll[i-1].location;
             snake_ll[i].location.x--;
@@ -1083,25 +1096,47 @@ void* snake(struct BadgeState *b_state)
         b_state->counter_1 = i;
     }
 
-    
-    //only update sometimes
-    if(b_state->big_counter > SNAKE_RATE)
+    //only update sometimes, game gets faster as snake gets bigger
+    if(b_state->big_counter > (SNAKE_RATE - (b_state->counter_1 << 7) ))
     {
         LCDClear();
+
+        struct coord loc;
+
+        loc.x = 0;
+        loc.y = 0;
+        fill_buff(&main_buff, 0x00);
+
+        draw_square(&main_buff, loc, 83, 47);
+        
+        loc.x = 62;
+        loc.y = 0;
+        draw_square(&main_buff, loc, 21, 8);
+
+        char score[] = "999";
+        score[0] = 48 + (b_state->counter_1 - SNAKE_START_SIZE) / 100;
+        score[1] = 48 + (b_state->counter_1 - SNAKE_START_SIZE) % 100 / 10;
+        score[2] = 48 + (b_state->counter_1 - SNAKE_START_SIZE) % 100 % 10;
+        buffString(loc.x+2, loc.y + 2,
+            score,
+            &main_buff);
+
         b_state->big_counter = 0;
 
-        putPixel(food.x,
-                    food.y,
-                    1);
+        putPixel_toBuff(&main_buff,
+                        food.x,
+                        food.y,
+                        1);
 
         if(snake_ll[0].location.x == food.x
                  && snake_ll[0].location.y == food.y)
         {
             srand(food.x);
-//            food.x = (~food.x) % 84; //rand()%84;
-//            food.y = (~food.y) %48;
-            food.x = (food.x + 5) %84;
-            food.y = (food.y + 5) %48;
+
+            food.x = (food.x + 5) %62;
+            food.y = (food.y + 5) %38 + 10;
+//            food.x = rand()%81 + 2;
+//            food.y = rand()%45 + 2;
             b_state->counter_1++;
             for(i = 0; i < b_state->counter_1; i++)
             {
@@ -1109,12 +1144,10 @@ void* snake(struct BadgeState *b_state)
                   && snake_ll[i].location.y == food.y)
                 {
                     //re init x and y
-                    food.x = (food.x + 5) %84;
-                    food.y = (food.y + 5) %48;
-                    //food.x = (~food.x) % 84; //rand()%84;
-                    //food.y = (~food.y) %48;
-                    //need to re-check them all :(
-                    //i = 0;
+                    food.x = (food.x + 5) %62;
+                    food.y = (food.y + 5) %38 + 10;
+//                    food.x = rand()%81 + 2;
+//                    food.y = rand()%45 + 2;
                 }
             }
         }
@@ -1122,18 +1155,21 @@ void* snake(struct BadgeState *b_state)
         for(i = b_state->counter_1 - 1; i > 0; i--)
         {
             snake_ll[i].location = snake_ll[i - 1].location;
-            //snake_ll[i].location.y = snake_ll[i - 1].direction.yV;
 
-            putPixel(snake_ll[i].location.x,
-                        snake_ll[i].location.y,
-                        1);
+            putPixel_toBuff(&main_buff,
+                            snake_ll[i].location.x,
+                            snake_ll[i].location.y,
+                            1);
         }
-        putPixel( snake_ll[0].location.x += snake_ll[0].direction.xV,
-                  snake_ll[0].location.y += snake_ll[0].direction.yV,
-                    1);
 
-        //works because of unsigned
-        if(snake_ll[0].location.x > 83 || snake_ll[0].location.y >47 )
+        putPixel_toBuff(&main_buff,
+                        snake_ll[0].location.x += snake_ll[0].direction.xV,
+                        snake_ll[0].location.y += snake_ll[0].direction.yV,
+                            1);
+
+        //check for boundry bust
+        if(snake_ll[0].location.x >= 83 || snake_ll[0].location.y >=46
+           || snake_ll[0].location.x < 1  || snake_ll[0].location.y < 1 )
         {
             start_state.next_state = &start_state;
             b_state->next_state = &start_state;
@@ -1150,6 +1186,7 @@ void* snake(struct BadgeState *b_state)
                 b_state->counter_2 = 0;
             }
         }
+        blitBuff_opt(&main_buff, 0, 0);
     }
     
     b_state->big_counter++;
