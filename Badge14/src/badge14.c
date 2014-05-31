@@ -4,6 +4,8 @@
 
 extern char gContrast;
 unsigned char pix[504] = {0};
+//dont need both in prod, debugging now
+unsigned char pix2[504] = {0};
 
 struct pix_buff main_buff, bird_idle_buff;
 
@@ -86,7 +88,7 @@ struct BadgeState snake_state, sketch_state, manual_contrast_state,
 
 void initGFX(void)
 {
-    main_buff.pixels = pix;
+    main_buff.pixels = pix2;
     main_buff.height = 48;
     main_buff.width = 84;
 
@@ -228,6 +230,7 @@ struct BadgeState* Init_Game(void)
 
 
     return (struct BadgeState *)&start_state;
+    //return &bird_state;
 }
 
 void Run_Game(struct BadgeState **state)
@@ -1205,13 +1208,15 @@ void* snake(struct BadgeState *b_state)
     }
 }
 
-#define BIRD_RATE 15000
+#define BIRD_RATE 5000
 #define G_ACC 1
+//y is inverted, so to minimize extra calcs, so is accel sign
 void* badgy_bird(struct BadgeState *b_state)
 {
     static unsigned char bird_y = 20;
-    static unsigned char bird_y_vel = 0;
-    
+    static char bird_y_vel = 0, y_acc_length = 0, y_acc_mag = -1;
+    struct coord loc;
+
 
     b_state->slide_handler(&b_state->slide_states);
 
@@ -1221,7 +1226,7 @@ void* badgy_bird(struct BadgeState *b_state)
 
     if(!b_state->counter_2)
     {
-        //LCDClear();
+        LCDClear();
         b_state->next_state = b_state;
 
         main_buff.pixels = pix;
@@ -1233,26 +1238,60 @@ void* badgy_bird(struct BadgeState *b_state)
         //force update
         b_state->big_counter = BIRD_RATE;
 
-        struct coord loc;
-
         loc.x = 0;
         loc.y = 0;
         fill_buff(&main_buff, 0x00);
 
         draw_square(&main_buff, loc, 83, 47);
+        b_state->counter_1 = 0;
+
     }
     if ( button_pressed == 250 )
     {
-
+        button_pressed++;
+        y_acc_mag = -7;
+        y_acc_length = 7;
+        b_state->counter_1 = 0;
     }
+    
      if(b_state->big_counter++ > BIRD_RATE)
      {
+        clear_screen_buff();
+        //draw_square(&main_buff, loc, 83, 47);
+        blitBuff_opt(&main_buff, 0, 0);
+        blitBuff_opt(&bird_idle_buff, 20, (unsigned char) bird_y, ALPHA);
+     
+        if( y_acc_length && y_acc_mag)
+        {
+            y_acc_length--;
+            y_acc_mag++;
+            bird_y_vel = (G_ACC + y_acc_mag + b_state->counter_1);
+            
+            bird_idle_buff.pixels = bird_flap;
+        }
+        else
+        {
+            bird_idle_buff.pixels = bird_idle;
+            bird_y_vel += (G_ACC + b_state->counter_1);
+        }
+
+        bird_y += bird_y_vel;
+        
+        if(bird_y_vel>0)
+            bird_idle_buff.pixels = bird_idle;
+        else
+            bird_idle_buff.pixels = bird_flap;
+
+        if(bird_y >= 35)
+        {
+            bird_y_vel = 0;
+            b_state->counter_1 = 0;
+            bird_y = 35;
+        }
 
         b_state->big_counter = 0;
-
-        blitBuff_opt(&main_buff, 0, 0);
-        blitBuff_opt(&bird_idle_buff, 20,20);
-     }
+        b_state->counter_1++;
+    }
 }
 
 void* draw_schedule_ticker(struct BadgeState *b_state)
