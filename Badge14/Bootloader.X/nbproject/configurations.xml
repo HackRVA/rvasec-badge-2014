@@ -8,10 +8,24 @@
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
                    projectFiles="true">
+      <itemPath>../bootloader_src/btl_32MX250F128D_generic.ld</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="f1" displayName="Framework" projectFiles="true">
+        <itemPath>../bootloader_src/FrameWork/Framework.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f2" displayName="TransportLayer" projectFiles="true">
+        <itemPath>../bootloader_src/TransportLayer/Usb_HID_tasks.c</itemPath>
+        <itemPath>../bootloader_src/TransportLayer/usb_descriptors.c</itemPath>
+      </logicalFolder>
+      <logicalFolder name="f3" displayName="USB_Stack" projectFiles="true">
+        <itemPath>../bootloader_src/USB/usb_device.c</itemPath>
+        <itemPath>../bootloader_src/USB/usb_function_hid.c</itemPath>
+      </logicalFolder>
+      <itemPath>../bootloader_src/BootLoader.c</itemPath>
+      <itemPath>../bootloader_src/NVMem.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -19,6 +33,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>../bootloader_src</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="default" type="2">

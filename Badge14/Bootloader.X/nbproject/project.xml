@@ -5,7 +5,7 @@
             <name>Bootloader</name>
             <creation-uuid>e0f13036-2f22-495f-8bcf-8243a84f9984</creation-uuid>
             <make-project-type>0</make-project-type>
-            <c-extensions/>
+            <c-extensions>c</c-extensions>
             <cpp-extensions/>
             <header-extensions/>
             <sourceEncoding>ISO-8859-1</sourceEncoding>
