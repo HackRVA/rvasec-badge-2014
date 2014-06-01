@@ -153,13 +153,21 @@ BOOL ValidAppPresent(void);
 *			
 * Note:		 	None.
 ********************************************************************/
-#define LED_STALL 1000
 INT main(void)
 {
-    TRISB = 0x00;
-    TRISA = 0x00;
+   TRISB = 0x00;
+   TRISA = 0x00;
 
-    unsigned char leds = 0xff, cnt = 0;
+   // config as input
+   TRISAbits.TRISA10 = 1;
+   TRISBbits.TRISB13 = 1;
+
+
+   //pull up off, pull down on
+   CNPUBbits.CNPUB13 = 0;
+   CNPDBbits.CNPDB13 = 1;
+
+
 	UINT pbClk;
 
 	// Setup configuration
@@ -218,16 +226,16 @@ BOOL  CheckTrigger(void)
 {
    unsigned char sw=0;
 
-   // config as input
-   TRISAbits.TRISA10 = 1;
-   TRISBbits.TRISB13 = 1;
+//   // config as input
+//   TRISAbits.TRISA10 = 1;
+//   TRISBbits.TRISB13 = 1;
    
    // pull up on
    CNPUAbits.CNPUA10 = 1;
 
-   //pull up off, pull down on
-   CNPUBbits.CNPUB13 = 0;
-   CNPDBbits.CNPDB13 = 1;
+//   //pull up off, pull down on
+//   CNPUBbits.CNPUB13 = 0;
+//   CNPDBbits.CNPDB13 = 1;
 
    // do it a couple times, waiting for pullup to activate
    sw |= PORTAbits.RA10;
