@@ -959,15 +959,6 @@ void blitBuff_opt(struct pix_buff* buff,
 }
 
 
-void blitBuff_new(struct pix_buff* buff,
-                  unsigned char x,
-                  unsigned char y)
-{
-    //go through each byte in buffer
-
-    //
-}
-
 //this blit needs to be smarter and utilize the LCD auto increment
 // and not put pixel!
 void blitBuff(struct pix_buff* buff, unsigned char x, unsigned char y)

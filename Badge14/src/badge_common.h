@@ -53,6 +53,11 @@ char do_BTM_CapTouch_Left();
 char do_BTM_CapTouch_Right();
 void set_leds(unsigned char leds);
 void putPix_to_buff(struct pix_buff *dest_buff, unsigned char x, unsigned char y);
+void fill_buff_area(struct coord loc,
+                    unsigned char width,
+                    unsigned char height,
+                    unsigned char fill,
+                    struct pix_buff *dest_buff);
 void draw_square(struct pix_buff *dest_buff, struct coord loc,
                 unsigned char width, unsigned char height);
 

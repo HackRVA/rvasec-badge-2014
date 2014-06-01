@@ -774,7 +774,7 @@ void* menu_maker(struct BadgeState *b_state)
     //set_leds(b_state->slide_states.front.lower_loc);
     char lr_swipe = b_state->slide_states.front.lr_swipe;
     char bt_swipe = b_state->slide_states.front.bt_swipe;
-    set_leds(leds += bt_swipe);
+    //set_leds(leds += bt_swipe);
 
     if(bt_swipe < 0
             && (current_menu->selected < (current_menu->num_entries - 1)))
@@ -884,7 +884,7 @@ void* manual_contrast(struct BadgeState *b_state)
         //set_leds(b_state->slide_states.front.lower_loc);
         char lr_swipe = b_state->slide_states.front.lr_swipe;
         char bt_swipe = b_state->slide_states.front.bt_swipe;
-        set_leds(leds += bt_swipe);
+        //set_leds(leds += bt_swipe);
 
         if(lr_swipe < 0 && x > 10)
                 //&& (current_menu->selected < (current_menu->num_entries - 1)))
@@ -1208,14 +1208,20 @@ void* snake(struct BadgeState *b_state)
     }
 }
 
-#define BIRD_RATE 5000
+#define BIRD_RATE 4000
+#define PIPE_RATE 50
 #define G_ACC 1
+#define PIPE_W 8    //width of the pipes
+#define PIPE_H 24   //height of openings
 //y is inverted, so to minimize extra calcs, so is accel sign
 void* badgy_bird(struct BadgeState *b_state)
 {
     static unsigned char bird_y = 20;
-    static char bird_y_vel = 0, y_acc_length = 0, y_acc_mag = -1;
+    static char bird_y_vel = 0, y_acc_length = 0, y_acc_mag = -1, draw_pipe = 0;
+    unsigned char opening_height = 33;
+    static unsigned int pipe_rate_cnt = 0;
     struct coord loc;
+    static struct coord pipe_loc;
 
 
     b_state->slide_handler(&b_state->slide_states);
@@ -1237,15 +1243,17 @@ void* badgy_bird(struct BadgeState *b_state)
 
         //force update
         b_state->big_counter = BIRD_RATE;
+        draw_pipe = 1;
 
         loc.x = 0;
         loc.y = 0;
-        fill_buff(&main_buff, 0x00);
+        pipe_loc.x = 83 - PIPE_W - 1;
+        pipe_loc.y = opening_height;
 
-        draw_square(&main_buff, loc, 83, 47);
         b_state->counter_1 = 0;
 
     }
+
     if ( button_pressed == 250 )
     {
         button_pressed++;
@@ -1257,24 +1265,22 @@ void* badgy_bird(struct BadgeState *b_state)
      if(b_state->big_counter++ > BIRD_RATE)
      {
         clear_screen_buff();
-        //draw_square(&main_buff, loc, 83, 47);
-        blitBuff_opt(&main_buff, 0, 0);
-        blitBuff_opt(&bird_idle_buff, 20, (unsigned char) bird_y, ALPHA);
-     
+        fill_buff(&main_buff, 0x00);
+        
+        //need to apply flap accel?
         if( y_acc_length && y_acc_mag)
         {
             y_acc_length--;
             y_acc_mag++;
             bird_y_vel = (G_ACC + y_acc_mag + b_state->counter_1);
-            
-            bird_idle_buff.pixels = bird_flap;
         }
+        //falling bird
         else
         {
-            bird_idle_buff.pixels = bird_idle;
             bird_y_vel += (G_ACC + b_state->counter_1);
         }
 
+        //apply velocity
         bird_y += bird_y_vel;
         
         if(bird_y_vel>0)
@@ -1288,9 +1294,34 @@ void* badgy_bird(struct BadgeState *b_state)
             b_state->counter_1 = 0;
             bird_y = 35;
         }
-
+        else
+            b_state->counter_1++;
         b_state->big_counter = 0;
-        b_state->counter_1++;
+        
+        //if(pipe_rate_cnt++ == PIPE_RATE)
+        {
+            if(pipe_loc.x == 0)
+            {
+                pipe_loc.x = 83 - PIPE_W - 1;
+                pipe_loc.y = opening_height;
+            }
+
+            pipe_loc.y = 1;
+            fill_buff_area(pipe_loc, PIPE_W, opening_height - PIPE_H,
+                               0xff, &main_buff);
+
+            pipe_loc.y = opening_height;
+            //bottom part of pipe
+            fill_buff_area(pipe_loc, PIPE_W, 48 - pipe_loc.y - 1,
+                                0xff, &main_buff);
+
+            pipe_loc.y = opening_height;
+            pipe_loc.x--;
+            pipe_rate_cnt = 0;
+        }
+        //draw_square(&main_buff, loc, 83, 48);
+        blitBuff_opt(&main_buff, 0, 0);
+        blitBuff_opt(&bird_idle_buff, 20, (unsigned char) bird_y, ALPHA);
     }
 }
 

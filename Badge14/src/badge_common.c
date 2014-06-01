@@ -91,6 +91,72 @@ void fill_buff(struct pix_buff *buff, unsigned char val)
         buff->pixels[i] = val;
 }
 
+void fill_buff_area(struct coord loc,
+                    unsigned char width,
+                    unsigned char height,
+                    unsigned char fill,
+                    struct pix_buff *dest_buff)
+{
+    unsigned int i, j, total_el = (dest_buff->height >> 3) * dest_buff->width;
+
+    unsigned char y_mod, y_pix, y_mod_end;
+    unsigned int base_y, base_y_end;
+
+    //should do other checks?
+    if (loc.x > dest_buff->width || loc.y > dest_buff->height)
+        return;
+
+    //start at top left corder,
+    //determine y for top horizontel line
+    y_mod = loc.y >> 3; // determines byte element
+    //y_pix = 1 << (loc.y - (y_mod << 3)); //determines bit within byte element
+    y_pix = 0xff >> 8 - (loc.y - (y_mod << 3)); //determines bit within byte element
+    base_y = y_mod * dest_buff->width; // start index
+
+    y_mod_end = (loc.y + height - 1) >> 3;
+
+    unsigned char y_pix_fill = 0xff << (loc.y - (y_mod << 3)); // get high bits for byte
+    //draw top line
+    for ( i = loc.x; i < loc.x + width; i++ )
+    {
+        //dest_buff->pixels[ base_y + i] |= y_pix;
+        dest_buff->pixels[ base_y + i] |= y_pix_fill;
+    }
+    //do edges
+    //do first, possible partial edge row
+
+//    dest_buff->pixels[ base_y + loc.x ] |= y_pix_fill;
+//    dest_buff->pixels[ base_y + loc.x + width] |= y_pix_fill;
+
+    if(y_mod_end != y_mod)
+    {
+        y_pix_fill = 0xff >> 8 - (loc.y + height - (y_mod_end << 3));
+        dest_buff->pixels[ y_mod_end  * dest_buff->width + loc.x ] |= y_pix_fill;
+        dest_buff->pixels[ y_mod_end  * dest_buff->width + loc.x + width  - 1] |= y_pix_fill;
+    }
+
+    for(i = y_mod + 1; i < y_mod_end; i++)
+    {
+        base_y = i * dest_buff->width;
+
+        for ( j = base_y; j < base_y + width; j++ )
+        {
+            dest_buff->pixels[ loc.x +  j ] |= 0xff; //y_pix_fill;
+        }
+    }
+
+    //determine y for bottom horizontel line
+    y_mod = (loc.y + height -1) >> 3; // determines byte element
+    y_pix = 1 << ((loc.y + height -1) - (y_mod << 3)); //determines bit within byte element
+    base_y = y_mod * dest_buff->width; // start index
+
+    for ( i = loc.x + 1; i < loc.x + width ; i++ )
+    {
+
+        dest_buff->pixels[ base_y + i] |= y_pix_fill;
+    }
+}
+
 //put a pixel on a one dimensional buffer
 void putPix_to_buff(struct pix_buff *dest_buff, unsigned char x, unsigned char y)
 {
