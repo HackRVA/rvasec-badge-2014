@@ -78,7 +78,7 @@ void set_leds(unsigned char leds)
    LATAbits.LATA0 = (0x20 & leds) >> 5;
 
    LATBbits.LATB15 = (0x40 & leds) >> 6;
-   LATBbits.LATB14 = 1;// (0x80 & leds) >> 7;
+   LATBbits.LATB14 = (0x80 & leds) >> 7;
 
 }
 

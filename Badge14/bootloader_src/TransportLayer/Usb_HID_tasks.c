@@ -41,12 +41,12 @@
 #include <plib.h>
 
 
-#include "./USB/usb.h"
+#include "../USB/usb.h"
 #include "../HardwareProfile/HardwareProfile.h"
-#include "./USB/usb_function_hid.h"
+#include "../USB/usb_function_hid.h"
 
-#include "Include/BootLoader.h"
-#include "Include/Framework/Framework.h"
+#include "../Include/BootLoader.h"
+#include "../Include/Framework/Framework.h"
 
 
 #define UsbTxBusy() 		(USBHandleBusy(USBInHandle))

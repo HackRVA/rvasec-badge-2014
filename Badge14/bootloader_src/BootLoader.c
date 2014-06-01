@@ -103,7 +103,7 @@
         #pragma config FSOSCEN  = OFF           // Secondary Oscillator Enable (KLO was off)
         #pragma config FNOSC    = PRIPLL        // Oscillator Selection
         #pragma config CP       = OFF           // Code Protect
-        #pragma config BWP      = OFF           // Boot Flash Write Protect
+        #pragma config BWP      = ON           // Boot Flash Write Protect
         #pragma config PWP      = OFF           // Program Flash Write Protect
         #pragma config ICESEL   = ICS_PGx2      // ICE/ICD Comm Channel Select
         #pragma config JTAGEN = OFF             // JTAG Enable (JTAG Disabled)
@@ -118,7 +118,19 @@
 
 #define SWITCH_PRESSED 0
 
+void set_leds(unsigned char leds)
+{
+   LATBbits.LATB3 = 0x01 & leds;
+   LATBbits.LATB2 =(0x02 & leds) >> 1;
+   LATBbits.LATB1 = (0x04 & leds) >> 2;
+   LATBbits.LATB0 = (0x08 & leds) >> 3;
 
+   LATAbits.LATA1 = (0x10 & leds) >> 4;
+   LATAbits.LATA0 = (0x20 & leds) >> 5;
+
+   LATBbits.LATB15 = (0x40 & leds) >> 6;
+   LATBbits.LATB14 = (0x80 & leds) >> 7;
+}
 
 BOOL CheckTrigger(void);
 void JumpToApp(void);
@@ -141,8 +153,13 @@ BOOL ValidAppPresent(void);
 *			
 * Note:		 	None.
 ********************************************************************/
+#define LED_STALL 1000
 INT main(void)
 {
+    TRISB = 0x00;
+    TRISA = 0x00;
+
+    unsigned char leds = 0xff, cnt = 0;
 	UINT pbClk;
 
 	// Setup configuration

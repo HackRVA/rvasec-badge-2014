@@ -245,7 +245,7 @@ firmware design flexibility.
 //----------------------------------------------------------------------------------*/
 
 /** INCLUDES *******************************************************/
-#include "./USB/usb.h"
+#include "usb.h"
 #include "../HardwareProfile/HardwareProfile.h"
 
 #include "../USB/usb_device_local.h"

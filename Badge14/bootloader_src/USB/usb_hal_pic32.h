@@ -124,7 +124,7 @@ Description:
 #if !defined(USB_HAL_PIC32_H)
 #define USB_HAL_PIC32_H
 
-#include "Compiler.h"
+#include "../Compiler.h"
 #include "usb_config.h"
 
 #if (USB_PING_PONG_MODE != USB_PING_PONG__FULL_PING_PONG)
