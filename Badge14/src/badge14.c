@@ -19,7 +19,6 @@ void initTouchState(struct TouchState *t_state)
     t_state->lower_slider_left = 0;
     t_state->lower_slider_right = 0;
 
-
     t_state->side_loc = 0;
     t_state->side_slider_left = 0;
     t_state->side_slider_right = 0;
@@ -211,7 +210,7 @@ struct BadgeState* Init_Game(void)
     //LCD_RVASec_Logo();
     //LCDLogo();
     //LCD backlight on
-//    LATBbits.LATB7 = 1;
+    LATBbits.LATB7 = 1;
     button_pressed = button_cnt = button_used = 0;
     btm_size = side_size = 0;
 
