@@ -49,7 +49,8 @@ void initConferenceEvents()
         //Badge Intro
     conf_events[5].start_time = 104000;
     conf_events[5].end_time = 105000;
-    b_strcpy(conf_events[5].title, "Morga & Paul");
+    b_strcpy(conf_events[5].title, "Morgan & Paul");
+    //b_strcpy(conf_events[5].title, "Badge Info:  Morgan & Paul");
 
     //11:00	12:00	Kizz MyAnthia
         //Into The Worm Hole: Metasploit For Web PenTesting

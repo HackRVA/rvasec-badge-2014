@@ -124,11 +124,6 @@ void fill_buff_area(struct coord loc,
         //dest_buff->pixels[ base_y + i] |= y_pix;
         dest_buff->pixels[ base_y + i] |= y_pix_fill;
     }
-    //do edges
-    //do first, possible partial edge row
-
-//    dest_buff->pixels[ base_y + loc.x ] |= y_pix_fill;
-//    dest_buff->pixels[ base_y + loc.x + width] |= y_pix_fill;
 
     if(y_mod_end != y_mod)
     {
@@ -406,5 +401,3 @@ unsigned char check_buffer_collisions(struct pix_buff *src_buff,
     }
     return found;
 }
-
-
