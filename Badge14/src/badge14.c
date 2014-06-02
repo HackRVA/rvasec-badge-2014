@@ -1273,7 +1273,6 @@ void* badgy_bird(struct BadgeState *b_state)
             //255 will == not it use yet
             pipe_locs[i].x = 0xff;
             pipe_locs[i].y = 0xff;
-            //pipe_heights[i] = 0xff;
         }
 
         b_state->counter_1 = 0;
@@ -1426,7 +1425,7 @@ void* badgy_bird(struct BadgeState *b_state)
                     }
                 }
             }
-
+            draw_square(&main_buff, loc, 83, 48);
             collision |= blitBuff_toBuff_collision(&bird_idle_buff, &main_buff,
                                                 BIRD_X, (unsigned char) bird_y, ALPHA );
 
@@ -1434,7 +1433,7 @@ void* badgy_bird(struct BadgeState *b_state)
             score[1] = 48 + (pipes_cleared) % 100 / 10;
             score[2] = 48 + (pipes_cleared) % 100 % 10;
 
-            buffString(65, 2,
+            buffString(64, 2,
                         score,
                         &main_buff);
 
