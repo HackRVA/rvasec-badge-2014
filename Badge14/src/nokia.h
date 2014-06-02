@@ -28,6 +28,11 @@ void clear_screen_buff(void);
 void LCDClear(void) ;
 void LCDClearArea(unsigned char x, unsigned char y,
                     unsigned char width, unsigned char height);
+
+//unsigned char blitBuff_toBuff_collision(struct pix_buff *src_buff, struct pix_buff *dest_buff,
+//                      unsigned char x,
+//                      unsigned char y,
+//                      BLIT_STYLE_t style);
 void LCDInit(void) ;
 void LCDWrite(byte data_or_command, byte data) ;
 void setBuf(unsigned char val);

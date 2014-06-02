@@ -228,8 +228,8 @@ struct BadgeState* Init_Game(void)
     start_state.slide_handler = autoSlide;
 
 
-    return (struct BadgeState *)&start_state;
-    //return &bird_state;
+    //return (struct BadgeState *)&start_state;
+    return &bird_state;
 }
 
 void Run_Game(struct BadgeState **state)
@@ -1047,7 +1047,7 @@ void* sliderPlay(struct BadgeState *b_state)
     return 0;
 }
 
-#define SNAKE_RATE 15000
+#define SNAKE_RATE 4000
 #define SNAKE_START_SIZE 5
 struct SnakeSeg snake_ll[200];
 void* snake(struct BadgeState *b_state)
@@ -1211,11 +1211,11 @@ void* snake(struct BadgeState *b_state)
 #define PIPE_RATE 50
 #define G_ACC 1
 #define PIPE_W 8    //width of the pipes
-#define PIPE_H 24   //height of openings
+#define PIPE_H 26   //height of openings
 //y is inverted, so to minimize extra calcs, so is accel sign
 void* badgy_bird(struct BadgeState *b_state)
 {
-    static unsigned char bird_y = 20;
+    static unsigned char bird_y = 20, collision = 0;
     static char bird_y_vel = 0, y_acc_length = 0, y_acc_mag = -1, draw_pipe = 0;
     unsigned char opening_height = 33;
     static unsigned int pipe_rate_cnt = 0;
@@ -1233,7 +1233,8 @@ void* badgy_bird(struct BadgeState *b_state)
     {
         LCDClear();
         b_state->next_state = b_state;
-
+        collision = 0;
+        
         main_buff.pixels = pix;
         main_buff.width = 84;
         main_buff.height = 48;
@@ -1263,6 +1264,13 @@ void* badgy_bird(struct BadgeState *b_state)
     
      if(b_state->big_counter++ > BIRD_RATE)
      {
+         if(collision)
+         {
+            start_state.next_state = &start_state;
+            b_state->next_state = &start_state;
+            b_state->counter_2 = 0;
+         }
+         
         clear_screen_buff();
         fill_buff(&main_buff, 0x00);
         
@@ -1319,8 +1327,11 @@ void* badgy_bird(struct BadgeState *b_state)
             pipe_rate_cnt = 0;
         }
         //draw_square(&main_buff, loc, 83, 48);
+        collision = blitBuff_toBuff_collision(&bird_idle_buff, &main_buff,
+                                            // 20, 24, ALPHA );
+                                            20, (unsigned char) bird_y, ALPHA );
         blitBuff_opt(&main_buff, 0, 0);
-        blitBuff_opt(&bird_idle_buff, 20, (unsigned char) bird_y, ALPHA);
+        //blitBuff_opt(&bird_idle_buff, 20, (unsigned char) bird_y, ALPHA);
     }
 }
 
@@ -1403,3 +1414,4 @@ void printTouchVals(unsigned char btm, unsigned char side)
         LCDString(val);
     }
 }
+

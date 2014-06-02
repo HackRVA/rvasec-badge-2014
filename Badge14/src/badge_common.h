@@ -61,6 +61,9 @@ void fill_buff_area(struct coord loc,
 void draw_square(struct pix_buff *dest_buff, struct coord loc,
                 unsigned char width, unsigned char height);
 
+unsigned char check_buffer_collisions(struct pix_buff *src_buff,
+                                     struct pix_buff *detect_buff,
+                                     unsigned char x, unsigned char y);
 void getTouchUL();
 void getTouchUR();
 void LCDClear(void) ;

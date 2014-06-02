@@ -1,8 +1,6 @@
 #include "badge_common.h"
 #include "Common/Compiler.h"
 
-
-
 char do_BTM_CapTouch_Right() {
 
     register char s0, s1, s2, s3, s4, s5, s6, s7;
@@ -261,13 +259,146 @@ void intTime_to_charTime(char* c_time, unsigned int i_time)
     c_time[5] = 0;
 }
 
-// only supports 3 digit
-//void itoa(unsigned char in_num, unsigned char *out_alpha)
-//{
-//    out_alpha[0] = 'L';
-//    out_alpha[1] = 48 +  (unsigned char)in_num / 100;
-//    out_alpha[2] = 48 + ((unsigned char)in_num % 100) / 10;
-//    out_alpha[3] = 48 + ((unsigned char)in_num % 100) % 10;
-//    out_alpha[4] = 32;
-//    out_alpha[5] = 0;
-//}
+unsigned char check_buffer_collisions(struct pix_buff *src_buff,
+                                     struct pix_buff *detect_buff,
+                                     unsigned char x, unsigned char y)
+{
+    //like blit buff to buff, but && the two buffs overlapping pixels
+    unsigned char src_y_mod_start, src_y_pix_start, src_y_mod_end, src_y_pix_end;
+    unsigned char dest_y_mod_start, dest_y_pix_start, dest_y_mod_end, dest_y_pix_end;
+    //unsigned char y_mod_start, y_pix_start, y_mod_end, y_pix_end;
+    unsigned int src_base_y_start, src_base_y_end, src_sw_buff_i = 0;
+    unsigned int dest_base_y_start, dest_base_y_end, dest_sw_buff_i = 0;
+
+    // how many byte rows are in the source buffer
+    unsigned char buff_mods = (src_buff->height >> 3) + 1;
+
+    unsigned char found = 0;
+
+    //do checks
+    if( detect_buff->height < (src_buff->height + y)
+        || detect_buff->width < src_buff->width + x)
+        return found;
+
+
+
+    // determines starting byte row
+    dest_y_mod_start = y >> 3;
+    //determines bit within starting byte element
+    dest_y_pix_start = 1 << (y - (dest_y_mod_start << 3));
+    // start index of destination given x and y
+    dest_base_y_start = dest_y_mod_start * detect_buff->width;
+    // end byte row of destination given x and by and src height
+    dest_y_mod_end = (y + src_buff->height) >> 3;
+    // where last pixel is in end byte row
+    dest_y_pix_end = 1 << ( (y + src_buff->height ) - (dest_y_mod_end << 3));
+
+    //need this?
+    dest_base_y_end = dest_y_mod_end * detect_buff->width;
+
+    src_y_mod_start = 0;
+    // this can be greater than the mod where real data is (x = 0, height =
+    src_y_mod_end = src_y_mod_start + buff_mods;
+
+    unsigned int i = 0, j = 0, k = 0;
+
+    unsigned char shift_down = (y - (dest_y_mod_start << 3));
+    unsigned char shift_down_end = (y - (dest_y_mod_end << 3));
+
+    unsigned int sw_buff_i_end = buff_mods * src_buff->width;
+    unsigned char temp_x = x;
+
+
+    i = src_y_mod_start;
+    j = dest_y_mod_start;
+    // if src will be blitted at start of byte
+    if(!shift_down)
+    {
+        //go through the entire source buffer index
+        for(src_sw_buff_i = 0;
+                src_sw_buff_i < sw_buff_i_end ;
+                    src_sw_buff_i++, dest_sw_buff_i++)
+        {
+           //check for start of row
+           if(!(src_sw_buff_i % src_buff->width))
+           {
+               //get index of dest buff location
+               dest_sw_buff_i = (j * detect_buff->width) + x;
+               j++;
+               src_sw_buff_i = i * src_buff->width;
+               i++;
+           }
+
+           if(detect_buff->pixels[dest_sw_buff_i] & src_buff->pixels[src_sw_buff_i])
+               found = 1;
+        }
+    }
+
+    else
+    {
+        src_sw_buff_i = 0;//buff->width;
+        dest_sw_buff_i = dest_y_mod_start * detect_buff->width + x;
+
+        //set LCD cursor to the right row
+        //gotoXY(x, i);
+        //reset x
+        temp_x = x;
+
+        // go through the first row in the buffer, it has to be split
+        // given the y value
+        for(j = src_sw_buff_i; j < src_sw_buff_i + src_buff->width; j++, dest_sw_buff_i++)
+        {
+            if( detect_buff->pixels[dest_sw_buff_i] & (src_buff->pixels[j] << shift_down) )
+                found = 1;
+        }
+
+        // reset SW buff, since first SW byte row is only partially blit
+        src_sw_buff_i = 0;
+
+        //enter loop if buffer will span more than two LCD rows
+        // -> if so, this should write out the middle portions
+        for (i = src_y_mod_start + 1, k = dest_y_mod_start +1;
+                i < src_y_mod_end; i++, k++)
+        {
+            //go to the next row
+            //gotoXY(x, i);
+            dest_sw_buff_i = k * detect_buff->width + x;
+            temp_x = x;
+
+            // go through the first row in the buffer
+            for(j = src_sw_buff_i , k = src_sw_buff_i + src_buff->width;
+                        j < src_sw_buff_i + src_buff->width; j++, k++, dest_sw_buff_i++)
+            {
+
+                if (detect_buff->pixels[dest_sw_buff_i] &
+                        ((src_buff->pixels[j] >> 8 -shift_down)
+                       |src_buff->pixels[k] << (shift_down)) )
+                    found = 1;
+            }
+
+            src_sw_buff_i += src_buff->width;
+        }
+
+        //blit last row byte
+        if(src_y_mod_start != src_y_mod_end)
+        {
+            //reset to the last row in the buffer
+            src_sw_buff_i = ((src_buff->height >> 3 )) * src_buff->width;
+            dest_sw_buff_i = ( (src_buff->height + y) >> 3 ) * detect_buff->width + x;
+            i = src_y_mod_end;
+            //should check if this cursor set is needed
+            //gotoXY(x, i);
+            temp_x = x;
+
+            // go through the first row in the buffer
+            for(j = src_sw_buff_i , k = src_sw_buff_i + src_buff->width;
+                        j < src_sw_buff_i + src_buff->width; j++, k++, dest_sw_buff_i++)
+            {
+
+                if( detect_buff->pixels[dest_sw_buff_i] & (src_buff->pixels[j] >> 8 -shift_down) )
+                    found = 1;
+            }
+        }
+    }
+    return found;
+}
