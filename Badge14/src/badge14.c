@@ -56,23 +56,24 @@ void initBadgeState(struct BadgeState *b_state)
 //initialize all the things
 struct BadgeState start_state;
 
-struct menu_entry *main_entries[2], games, settings, sketch, adventure;
+struct menu_entry *main_entries[3], games, schedule, settings, sketch, adventure;
 
 //extra element for back button
 struct menu_entry *game_entries[5], snake_e, bird_e, pong_e;
 struct menu_entry *settings_entries[4], backlight, contrast, speaker;
 struct menu_entry back_to_main;
 
-struct menu_page *current_menu, main_page, games_page, settings_page;
+struct menu_page *current_menu, main_page, games_page, settings_page, schedule_page;
 
 //main menu texts
 char game_txt[] = "DIVERSIONS",
-        adventure_txt[] = "ADVENTURE",
-        sketch_txt[] = "SKETCH",
+        schedule_txt[] = "SCHEDULE",
         settings_txt[] = "SETTINGS";
 
 //games menu texts
 char snake_txt[] = "SNAKE",
+        adventure_txt[] = "ADVENTURE",
+        sketch_txt[] = "SKETCH",
         bird_txt[] = "BADGY BIRD",
         pong_txt[] = "PONG";
 
@@ -84,7 +85,7 @@ char set_backlight[] = "BACKLIGHT",
 char go_back[] = "<-[BACK]";
 //main_page.entries;
 struct BadgeState snake_state, sketch_state, manual_contrast_state,
-                    bird_state;
+                    bird_state, schedule_browse_state;
 
 void initGFX(void)
 {
@@ -117,32 +118,31 @@ void setupMenus(void)
         bird_state.state_handler = badgy_bird;
         bird_state.next_state = &bird_state;
         bird_state.slide_handler = basicSlide;
+
+    initBadgeState(&schedule_browse_state);
+        schedule_browse_state.state_handler = browse_schedule;
+        schedule_browse_state.next_state = &schedule_browse_state;
         
     current_menu = &main_page;
 
     //-----------------------
     // setup MAIN
-    main_page.num_entries = 2;
+    main_page.num_entries = 3;
     main_page.selected = 0;
     main_page.entries = main_entries;
-    main_page.extra_func = draw_schedule_ticker;
+    main_page.extra_func = draw_main_ticker;
     
     main_entries[0] = &games;
         games.text = game_txt;
         games.menu_entry = &games_page;
         games.state_entry = 0;
 
-//    main_entries[1] = &adventure;
-//        adventure.text = adventure_txt;
-//        adventure.menu_entry = 0;
-//        adventure.state_entry = 0;
+    main_entries[1] = &schedule;
+        schedule.text = schedule_txt;
+        schedule.menu_entry = 0;
+        schedule.state_entry = &schedule_browse_state;
 
-//    main_entries[2] = &sketch;
-//        sketch.text = sketch_txt;
-//        sketch.menu_entry = 0;
-//        sketch.state_entry = &sketch_state;
-
-    main_entries[1] = &settings;
+    main_entries[2] = &settings;
         settings.text = settings_txt;
         settings.menu_entry = &settings_page;
         settings.state_entry = 0;
@@ -174,6 +174,13 @@ void setupMenus(void)
         sketch.state_entry = &sketch_state;
 
     game_entries[4] = &back_to_main;
+
+    //-----------------------
+    // setup SCHEDULE
+    schedule_page.num_entries = 0;
+    schedule_page.selected = 0;
+    schedule_page.entries = 0;
+    schedule_page.extra_func = draw_main_ticker;
 
 
     //-----------------------
@@ -1044,10 +1051,8 @@ void* menu_maker(struct BadgeState *b_state)
 
     b_state->slide_handler(&b_state->slide_states);
 
-    //set_leds(b_state->slide_states.front.lower_loc);
     char lr_swipe = b_state->slide_states.front.lr_swipe;
     char bt_swipe = b_state->slide_states.front.bt_swipe;
-    //set_leds(leds += bt_swipe);
 
     if(bt_swipe < 0
             && (current_menu->selected < (current_menu->num_entries - 1)))
@@ -1061,45 +1066,53 @@ void* menu_maker(struct BadgeState *b_state)
         current_menu->selected -= 1;
         redraw = 1;
     }
+    
+    set_leds(current_menu->selected + 1);
 
-    if ( button_pressed == 250 )
+    if ( button_pressed == 250 && current_menu->entries)
     {
         LCDClear();
         fill_buff(&main_buff, 0x00);
+        redraw = 1;
+        button_pressed++;
+
         if( current_menu->entries[current_menu->selected]->menu_entry )
         {
             current_menu
                     = current_menu->entries[current_menu->selected]->menu_entry;
+            return;
         }
         else if ( current_menu->entries[current_menu->selected]->state_entry )
         {
             b_state->next_state
                     = current_menu->entries[current_menu->selected]->state_entry;
+            return;
         }
-        redraw = 1;
-        button_pressed++;
-        return;
     }
 
     if(b_state->counter_1 == 0 || redraw)
     {
-        LCDClear();
-        //fill_buff(&buff, 0x00);
-        b_state->counter_1 = 1;
+        b_state->counter_1 = 0;
         redraw = 0;
         unsigned char i = 0, t_x = 83, t_y = 8;
         char selected[] = ">", unselected[] = "";
 
-        //buff.pixels = pix;
         fill_buff(&main_buff, 0x00);
 
         gotoXY(0,0);
 
+        // extra func should set counter_1 to > 1 if it doesn't need
+        // constant servicing. Set counter_1 to 0 to have the screen redrawn.
+        if(current_menu->extra_func)// && b_state->counter_1 == 1 )
+        {
+            current_menu->extra_func(b_state);
+        }
+
         for(i = 0; i < current_menu->num_entries; i++)
         {
-            loc.x = 0 ;//- (t_x>>1);
+            loc.x = 0 ;
 
-            loc.y = i*t_y;// - (t_y>>1);
+            loc.y = i*t_y;
 
             loc.y -= i;
 
@@ -1123,22 +1136,22 @@ void* menu_maker(struct BadgeState *b_state)
                                  &main_buff);
             }
             else if(i == current_menu->selected)
-
-            {
                 invertBuffArea(loc.x + 1 ,
                                 loc.y + 1,
                                  t_x - 3,
                                  t_y - 2,
                                  &main_buff);
-            }
-        }
-        if(current_menu->extra_func)
-        {
-            current_menu->extra_func(b_state);
         }
 
         blitBuff_opt(&main_buff, 0, 0);
+        b_state->counter_1 = 1;
     }
+
+    if(current_menu->extra_func && b_state->counter_1 == 1 )
+    {
+        current_menu->extra_func(b_state);
+    }
+
 }
 
 void* manual_contrast(struct BadgeState *b_state)
@@ -1318,7 +1331,7 @@ void* sliderPlay(struct BadgeState *b_state)
     return 0;
 }
 
-#define SNAKE_RATE 4000
+#define SNAKE_RATE 6000
 #define SNAKE_START_SIZE 5
 struct SnakeSeg snake_ll[200];
 void* snake(struct BadgeState *b_state)
@@ -1333,6 +1346,17 @@ void* snake(struct BadgeState *b_state)
     char lr_swipe = b_state->slide_states.front.lr_swipe;
     char bt_swipe = b_state->slide_states.front.bt_swipe;
     
+    if ( button_pressed == 250)
+    {
+        fill_buff(&main_buff, 0x00);
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        b_state->counter_2 = 0;
+        b_state->counter_1 = 0;
+        b_state->big_counter = 0;
+        return;
+    }
+
     if(bt_swipe < 0 && !snake_ll[0].direction.yV)
     {
         snake_ll[0].direction.yV = 1;
@@ -1709,30 +1733,58 @@ void* badgy_bird(struct BadgeState *b_state)
     }
 }
 
-void* draw_schedule_ticker(struct BadgeState *b_state)
+#define MAIN_TICKER_RATE 60000
+void* draw_main_ticker(struct BadgeState *b_state)
 {
-    struct coord loc;
-    loc.x = 0;
-    loc.y = 36;
-    char test[] = "Welcome Test";
-    char start_time[5], end_time[5];
+    static unsigned char ticker_i = 0, cnt;
+    
+    b_state->big_counter_1++;
 
-    intTime_to_charTime(start_time, conf_events[b_state->counter_2].start_time);
-    intTime_to_charTime(end_time, conf_events[b_state->counter_2].end_time);
+    if(b_state->big_counter_1 == MAIN_TICKER_RATE)
+    {
+        // tell menu maker to redraw
+        b_state->counter_1 = 0;
 
-    draw_square(&main_buff, loc, 83, 11);
+        //reset counter
+        b_state->big_counter_1 = 0;
 
-    buffString(1, 39,
-        start_time,
-                &main_buff);
+        //scroll through events
+        if(b_state->counter_2 < NUM_EVENTS - 1)
+            b_state->counter_2++;
+        else
+            b_state->counter_2 = 0;
+    }
 
-    buffString(48, 39,
-        end_time,
-                &main_buff);
+    //may result in duplicate redraws... w/e
+    if(!b_state->counter_1)
+    {
 
-    buffString(0, 28,
-        conf_events[b_state->counter_2].title,
-                &main_buff);
+        struct coord loc;
+        loc.x = 0;
+        loc.y = 36;
+        char start_time[5], end_time[5];
+        intTime_to_charTime(start_time, conf_events[b_state->counter_2].start_time);
+        intTime_to_charTime(end_time, conf_events[b_state->counter_2].end_time);
+
+        draw_square(&main_buff, loc, 83, 11);
+
+        buffString(1, 39,
+            start_time,
+                    &main_buff);
+
+        buffString(48, 39,
+            end_time,
+                    &main_buff);
+
+        buffString_trunc(0, 28,
+                        conf_events[b_state->counter_2].title,
+                        14,
+                        11,
+                        "...",
+                    &main_buff);
+
+    }
+
 }
 
 void printTouchVals(unsigned char btm, unsigned char side)
@@ -1788,3 +1840,64 @@ void printTouchVals(unsigned char btm, unsigned char side)
     }
 }
 
+void* browse_schedule(struct BadgeState *b_state)
+{
+    unsigned char redraw = 0;
+    b_state->slide_handler(&b_state->slide_states);
+
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+    if(!b_state->counter_1)
+    {
+        redraw = 1;
+        b_state->counter_1++;
+        b_state->next_state = b_state;
+    }
+
+    if(bt_swipe < 0 && b_state->counter_2 < NUM_EVENTS - 1)
+    {
+        b_state->counter_2++;
+        redraw = 1;
+    }
+
+    if(bt_swipe > 0 && b_state->counter_2 > 0)
+    {
+        b_state->counter_2--;
+        redraw = 1;
+    }
+    if ( button_pressed == 250)
+    {
+        button_pressed++;
+        fill_buff(&main_buff, 0x00);
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        b_state->counter_1 = 0;
+
+    }
+    if(redraw)
+    {
+        struct coord loc;
+        loc.x = 0;
+        loc.y = 0;
+        char start_time[5], end_time[5];
+        fill_buff(&main_buff, 0x00);
+        intTime_to_charTime(start_time, conf_events[b_state->counter_2].start_time);
+        intTime_to_charTime(end_time, conf_events[b_state->counter_2].end_time);
+
+        draw_square(&main_buff, loc, 83, 11);
+
+        buffString(1, 2,
+                    start_time,
+                    &main_buff);
+
+        buffString(48, 2,
+                    end_time,
+                    &main_buff);
+
+        buffString(0, 14,
+            conf_events[b_state->counter_2].title,
+                    &main_buff);
+
+        blitBuff_opt(&main_buff, 0, 0);
+    }
+}

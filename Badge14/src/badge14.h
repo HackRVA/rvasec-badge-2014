@@ -111,6 +111,7 @@ struct BadgeState
     unsigned char counter_1;
     unsigned char counter_2;
     unsigned int big_counter;
+    unsigned int big_counter_1;
 };
 
 struct menu_entry
@@ -161,7 +162,8 @@ unsigned char calibrateSide(struct BadgeState *b_state);
 unsigned char calibrateSide2(struct BadgeState *b_state);
 
 //don't use as a standalone state
-void* draw_schedule_ticker(struct BadgeState *b_state);
+void* draw_main_ticker(struct BadgeState *b_state);
+void* browse_schedule(struct BadgeState *b_state);
 
 void* welcome(struct BadgeState *b_state);
 void* main_menu(struct BadgeState *b_state);
