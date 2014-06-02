@@ -115,6 +115,9 @@ void fill_buff_area(struct coord loc,
 
     unsigned char y_pix_fill = 0xff << (loc.y - (y_mod << 3)); // get high bits for byte
 
+    if(y_mod == y_mod_end)
+        y_pix_fill &= 0xff >> 8 - (loc.y + height - (y_mod_end << 3));
+
     //draw top section
     for ( i = loc.x; i < loc.x + width; i++ )
     {
@@ -132,26 +135,27 @@ void fill_buff_area(struct coord loc,
         y_pix_fill = 0xff >> 8 - (loc.y + height - (y_mod_end << 3));
         dest_buff->pixels[ y_mod_end  * dest_buff->width + loc.x ] |= y_pix_fill;
         dest_buff->pixels[ y_mod_end  * dest_buff->width + loc.x + width  - 1] |= y_pix_fill;
-    }
+    
 
-    for(i = y_mod + 1; i < y_mod_end; i++)
-    {
-        base_y = i * dest_buff->width;
-
-        for ( j = base_y; j < base_y + width; j++ )
+        for(i = y_mod + 1; i < y_mod_end; i++)
         {
-            dest_buff->pixels[ loc.x +  j ] |= 0xff; //y_pix_fill;
+            base_y = i * dest_buff->width;
+
+            for ( j = base_y; j < base_y + width; j++ )
+            {
+                dest_buff->pixels[ loc.x +  j ] |= 0xff; //y_pix_fill;
+            }
         }
-    }
 
-    //determine y for bottom horizontel line
-    y_mod = (loc.y + height -1) >> 3; // determines byte element
-    y_pix = 1 << ((loc.y + height -1) - (y_mod << 3)); //determines bit within byte element
-    base_y = y_mod * dest_buff->width; // start index
+        //determine y for bottom horizontel line
+        y_mod = (loc.y + height -1) >> 3; // determines byte element
+        y_pix = 1 << ((loc.y + height -1) - (y_mod << 3)); //determines bit within byte element
+        base_y = y_mod * dest_buff->width; // start index
 
-    for ( i = loc.x + 1; i < loc.x + width - 1; i++ )
-    {
-        dest_buff->pixels[ base_y + i] |= y_pix_fill;
+        for ( i = loc.x + 1; i < loc.x + width - 1; i++ )
+        {
+            dest_buff->pixels[ base_y + i] |= y_pix_fill;
+        }
     }
 }
 
@@ -402,3 +406,5 @@ unsigned char check_buffer_collisions(struct pix_buff *src_buff,
     }
     return found;
 }
+
+

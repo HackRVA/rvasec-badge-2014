@@ -69,6 +69,7 @@ void getTouchUR();
 void LCDClear(void) ;
 void LCDInit(void) ;
 void LCDLogo();
+
 //void printTouchVals(void);
 //void itoa(unsigned char in_num,
 //          unsigned char *out_alpha);

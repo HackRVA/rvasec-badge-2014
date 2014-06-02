@@ -147,11 +147,13 @@ void initBadgeState(struct BadgeState *b_state);
 //////////////////////////////
 void* basicSlide(struct TouchQueue *t_queue);
 void* autoSlide(struct TouchQueue *t_queue);
-
+void* superSlide(struct TouchQueue *t_queue);
 //////////////////////////////
 // STATE HANDLERS
 //////////////////////////////
 void* touchCalibrate(struct BadgeState *b_state);
+void* touchCalibrate2(struct BadgeState *b_state);
+
 unsigned char calibrateBottom(struct BadgeState *b_state);
 unsigned char calibrateBottom2(struct BadgeState *b_state);
 
