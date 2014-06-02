@@ -572,7 +572,7 @@ void buffCharacter(unsigned char x,
 }
 
 #define CHAR_HEIGHT 7
-#define CHAR_WIDTH 7
+#define CHAR_WIDTH 6
 void buffString(unsigned char x, 
                 unsigned char y,
                 char *characters,
@@ -592,6 +592,71 @@ void buffString(unsigned char x,
         x += CHAR_WIDTH;
     }
 }
+
+void buffString_trunc(unsigned char x,
+                        unsigned char y,
+                        char *characters,
+                        unsigned char trunc_lim,         //truncate if it exceeds
+                        unsigned char trunc_start,       //index to inser trunc
+                        const unsigned char *trunc_string,
+                        struct pix_buff *buff)
+{
+    unsigned char cnt = 0;
+
+    while((characters[cnt]) && (cnt < trunc_lim) )  
+        cnt++;
+
+    if(cnt == trunc_lim && characters[cnt])
+    {
+        cnt = 0;
+        while(*characters && (cnt++ < trunc_start) )
+        {
+            if(x > 79 || *characters == '\n' )
+            {
+                if(*characters == '\n')
+                    *characters++;
+
+                y += CHAR_HEIGHT;
+                x = 0;
+            }
+
+            buffCharacter(x, y, *characters++, buff);
+            x += CHAR_WIDTH;
+        }
+        if(cnt >= trunc_start)
+            while(*trunc_string)
+            {
+                if(x > 79 || *trunc_string == '\n' )
+                {
+                    if(*trunc_string == '\n')
+                        *trunc_string++;
+
+                    y += CHAR_HEIGHT;
+                    x = 0;
+                }
+
+                buffCharacter(x, y, *trunc_string++, buff);
+                x += CHAR_WIDTH;
+            }
+    }
+    else
+    {
+        while(*characters)
+        {
+            if(x > 79 || *characters == '\n')
+            {
+                if(*characters == '\n')
+                    *characters++;
+
+                y += CHAR_HEIGHT;
+                x = 0;
+            }
+            buffCharacter(x, y, *characters++, buff);
+            x += CHAR_WIDTH;
+        }
+    }
+}
+
 
 void clear_screen_buff(void)
 {
