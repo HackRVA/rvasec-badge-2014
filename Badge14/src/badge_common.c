@@ -114,7 +114,8 @@ void fill_buff_area(struct coord loc,
     y_mod_end = (loc.y + height - 1) >> 3;
 
     unsigned char y_pix_fill = 0xff << (loc.y - (y_mod << 3)); // get high bits for byte
-    //draw top line
+
+    //draw top section
     for ( i = loc.x; i < loc.x + width; i++ )
     {
         //dest_buff->pixels[ base_y + i] |= y_pix;
@@ -148,9 +149,8 @@ void fill_buff_area(struct coord loc,
     y_pix = 1 << ((loc.y + height -1) - (y_mod << 3)); //determines bit within byte element
     base_y = y_mod * dest_buff->width; // start index
 
-    for ( i = loc.x + 1; i < loc.x + width ; i++ )
+    for ( i = loc.x + 1; i < loc.x + width - 1; i++ )
     {
-
         dest_buff->pixels[ base_y + i] |= y_pix_fill;
     }
 }

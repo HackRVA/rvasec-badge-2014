@@ -1209,20 +1209,33 @@ void* snake(struct BadgeState *b_state)
 
 #define BIRD_RATE 4000
 #define BIRD_ST_HIEGHT 20
+#define BIRD_X 20
 #define PIPE_RATE 50
+#define SHORTEST_PIPE_D 24
+#define PIPE_X_B4_ADD 84 - SHORTEST_PIPE_D
 #define G_ACC 1
 #define PIPE_W 8    //width of the pipes
-#define PIPE_H 26   //height of openings
-//y is inverted, so to minimize extra calcs, so is accel sign
+#define PIPE_H 25   //height of openings
+#define MAX_PIPES 2
+struct coord pipe_locs[MAX_PIPES];
+unsigned char bird_y = BIRD_ST_HIEGHT,
+                         collision = 0, b_rand = 0;
+char bird_y_vel = 0, y_acc_length = 0, y_acc_mag = -1, draw_pipe = 0;
+// y is inverted, so to minimize extra calcs, so is accel sign
+// Really ugly as one big function, may take time to separate out later....
 void* badgy_bird(struct BadgeState *b_state)
 {
-    static unsigned char bird_y = BIRD_ST_HIEGHT, collision = 0;
-    static char bird_y_vel = 0, y_acc_length = 0, y_acc_mag = -1, draw_pipe = 0;
-    unsigned char opening_height = 33;
-    static unsigned int pipe_rate_cnt = 0;
+//    static unsigned char bird_y = BIRD_ST_HIEGHT,
+//                         collision = 0, b_rand = 0;//,
+//                         //pipe_heights[MAX_PIPES];
+//    static char bird_y_vel = 0, y_acc_length = 0, y_acc_mag = -1, draw_pipe = 0;
+    unsigned char i = 0, j = 0;
+    unsigned char opening_height = 27;
+    static unsigned char pipes_cleared = 0, last_cleared = 99;
+    unsigned char score[] = "999";
+    //static unsigned int pipe_rate_cnt = 0;
     struct coord loc;
-    static struct coord pipe_loc;
-
+    //static struct coord pipe_locs[MAX_PIPES];
 
     b_state->slide_handler(&b_state->slide_states);
 
@@ -1230,13 +1243,17 @@ void* badgy_bird(struct BadgeState *b_state)
     char lr_swipe = b_state->slide_states.front.lr_swipe;
     char bt_swipe = b_state->slide_states.front.bt_swipe;
 
+    //initialize things
     if(!b_state->counter_2)
     {
+        //unsigned char i, j;
         char badgy_txt[] = "Badgy", bird_txt[] = "Bird";
         LCDClear();
         b_state->next_state = b_state;
         collision = 0;
-        
+        pipes_cleared = 0;
+        last_cleared = 99;
+
         main_buff.pixels = pix;
         main_buff.width = 84;
         main_buff.height = 48;
@@ -1249,8 +1266,15 @@ void* badgy_bird(struct BadgeState *b_state)
 
         loc.x = 0;
         loc.y = 0;
-        pipe_loc.x = 83 - PIPE_W - 1;
-        pipe_loc.y = opening_height;
+
+        //init all pipes
+        for(i = 0; i < MAX_PIPES; i++)
+        {
+            //255 will == not it use yet
+            pipe_locs[i].x = 0xff;
+            pipe_locs[i].y = 0xff;
+            //pipe_heights[i] = 0xff;
+        }
 
         b_state->counter_1 = 0;
         bird_y = BIRD_ST_HIEGHT;
@@ -1264,13 +1288,16 @@ void* badgy_bird(struct BadgeState *b_state)
                     bird_txt,
                     &main_buff);
         bird_idle_buff.pixels = bird_flap;
+
         //setup paused screen
-        collision = blitBuff_toBuff_collision(&bird_idle_buff, &main_buff,
-                                                20, (unsigned char) bird_y,
-                                                ALPHA );
+        blitBuff_toBuff(&bird_idle_buff, &main_buff,
+                        20, (unsigned char) bird_y,
+                        ALPHA );
+        
         blitBuff_opt(&main_buff, 0, 0);
 
     }
+    // paused start screen
     else if(b_state->counter_2 == 1)
     {
         if ( button_pressed == 250 )
@@ -1282,6 +1309,7 @@ void* badgy_bird(struct BadgeState *b_state)
             b_state->counter_1 = 0;
         }
     }
+    // game playing
     else
     {
         if ( button_pressed == 250 )
@@ -1290,24 +1318,27 @@ void* badgy_bird(struct BadgeState *b_state)
             y_acc_mag = -7;
             y_acc_length = 7;
             b_state->counter_1 = 0;
+
+            //gen random from time between btn presses
+            b_rand ^= ReadCoreTimer() & 0xff;
         }
 
          if(b_state->big_counter++ > BIRD_RATE)
          {
+             
+             //clean things up
+             clear_screen_buff();
+             fill_buff(&main_buff, 0x00);
+
+             //hit floor or pipe, enter start screen after this draw
              if(collision)
              {
-//                start_state.next_state = &start_state;
-//                b_state->next_state = &start_state;
                 b_state->counter_2 = 0;
                 b_state->counter_1 = 0;
-                b_state->big_counter = 0;
-                
+                b_state->big_counter = 0;     
              }
 
-            clear_screen_buff();
-            fill_buff(&main_buff, 0x00);
-
-            //need to apply flap accel?
+            //flapping bird, apply flap accel
             if( y_acc_length && y_acc_mag)
             {
                 y_acc_length--;
@@ -1332,38 +1363,81 @@ void* badgy_bird(struct BadgeState *b_state)
             {
                 collision |= 1;
                 bird_y_vel = 0;
-//                b_state->counter_1 = 0;
-//                bird_y = BIRD_ST_HIEGHT;
             }
             else
                 b_state->counter_1++;
+
             b_state->big_counter = 0;
 
-            //if(pipe_rate_cnt++ == PIPE_RATE)
+            for(i = 0; i < MAX_PIPES; i++)
             {
-                if(pipe_loc.x == 0)
+                // reset pipe
+                if(pipe_locs[i].x == 0)
                 {
-                    pipe_loc.x = 83 - PIPE_W - 1;
-                    pipe_loc.y = opening_height;
+                    pipe_locs[i].x = 0xff;
+                    pipe_locs[i].y = 0xff;
                 }
+                // pipe not in play, check if it can be and
+                // randomly put it into play
+                else if(pipe_locs[i].x == 0xff)
+                {
+                    // j is  index of pipe in front of i pipe
+                    //j = (i == 0) ?  MAX_PIPES - 1: i -1;
+                    if(!i)
+                        j = MAX_PIPES - 1;
+                    else
+                        j = i - 1;
 
-                pipe_loc.y = 1;
-                fill_buff_area(pipe_loc, PIPE_W, opening_height - PIPE_H,
-                                   0xff, &main_buff);
+                    if(pipe_locs[j].x != 0xff || pipe_locs[j].x < PIPE_X_B4_ADD)
+                    {
+                        //random is div 3
+                        if(pipe_locs[j].x < PIPE_X_B4_ADD && !(b_rand % 3))
+                        {
+                            pipe_locs[i].x = 83 - PIPE_W - 1;
+                            pipe_locs[i].y = opening_height + (b_rand % 15);
+                        }
+                    }
+                    else if( !i )
+                    {
+                        pipe_locs[i].x = 83 - PIPE_W - 1;
+                        pipe_locs[i].y = opening_height + (b_rand % 15);
+                    }
+                }
+                //pipe needs drawing
+                if(pipe_locs[i].x != 0 && pipe_locs[i].x != 0xff)// && !collision)
+                {
+                    unsigned char h = pipe_locs[i].y;
+                    pipe_locs[i].y = 0;
 
-                pipe_loc.y = opening_height;
-                //bottom part of pipe
-                fill_buff_area(pipe_loc, PIPE_W, 48 - pipe_loc.y - 1,
-                                    0xff, &main_buff);
+                    //draw top part of pipe
+                    fill_buff_area(pipe_locs[i], PIPE_W, h - PIPE_H,
+                                       0xff, &main_buff);
 
-                pipe_loc.y = opening_height;
-                pipe_loc.x--;
-                pipe_rate_cnt = 0;
+                    pipe_locs[i].y = h;
+                    //bottom part of pipe
+                    fill_buff_area(pipe_locs[i], PIPE_W, 48 - pipe_locs[i].y - 1,
+                                        0xff, &main_buff);
+
+                    pipe_locs[i].x--;
+                    if(pipe_locs[i].x < (BIRD_X - PIPE_W - 1) && (i != last_cleared))
+                    {
+                        last_cleared = i;
+                        pipes_cleared++;
+                    }
+                }
             }
-            //draw_square(&main_buff, loc, 83, 48);
+
             collision |= blitBuff_toBuff_collision(&bird_idle_buff, &main_buff,
-                                                // 20, 24, ALPHA );
-                                                20, (unsigned char) bird_y, ALPHA );
+                                                BIRD_X, (unsigned char) bird_y, ALPHA );
+
+            score[0] = 48 + (pipes_cleared) / 100;
+            score[1] = 48 + (pipes_cleared) % 100 / 10;
+            score[2] = 48 + (pipes_cleared) % 100 % 10;
+
+            buffString(65, 2,
+                        score,
+                        &main_buff);
+
             blitBuff_opt(&main_buff, 0, 0);
         }
     }
