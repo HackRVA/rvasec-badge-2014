@@ -1208,6 +1208,7 @@ void* snake(struct BadgeState *b_state)
 }
 
 #define BIRD_RATE 4000
+#define BIRD_ST_HIEGHT 20
 #define PIPE_RATE 50
 #define G_ACC 1
 #define PIPE_W 8    //width of the pipes
@@ -1215,7 +1216,7 @@ void* snake(struct BadgeState *b_state)
 //y is inverted, so to minimize extra calcs, so is accel sign
 void* badgy_bird(struct BadgeState *b_state)
 {
-    static unsigned char bird_y = 20, collision = 0;
+    static unsigned char bird_y = BIRD_ST_HIEGHT, collision = 0;
     static char bird_y_vel = 0, y_acc_length = 0, y_acc_mag = -1, draw_pipe = 0;
     unsigned char opening_height = 33;
     static unsigned int pipe_rate_cnt = 0;
@@ -1231,6 +1232,7 @@ void* badgy_bird(struct BadgeState *b_state)
 
     if(!b_state->counter_2)
     {
+        char badgy_txt[] = "Badgy", bird_txt[] = "Bird";
         LCDClear();
         b_state->next_state = b_state;
         collision = 0;
@@ -1251,87 +1253,119 @@ void* badgy_bird(struct BadgeState *b_state)
         pipe_loc.y = opening_height;
 
         b_state->counter_1 = 0;
-
-    }
-
-    if ( button_pressed == 250 )
-    {
-        button_pressed++;
-        y_acc_mag = -7;
-        y_acc_length = 7;
-        b_state->counter_1 = 0;
-    }
-    
-     if(b_state->big_counter++ > BIRD_RATE)
-     {
-         if(collision)
-         {
-            start_state.next_state = &start_state;
-            b_state->next_state = &start_state;
-            b_state->counter_2 = 0;
-         }
-         
+        bird_y = BIRD_ST_HIEGHT;
         clear_screen_buff();
         fill_buff(&main_buff, 0x00);
-        
-        //need to apply flap accel?
-        if( y_acc_length && y_acc_mag)
-        {
-            y_acc_length--;
-            y_acc_mag++;
-            bird_y_vel = (G_ACC + y_acc_mag + b_state->counter_1);
-        }
-        //falling bird
-        else
-        {
-            bird_y_vel += (G_ACC + b_state->counter_1);
-        }
+        draw_square(&main_buff, loc, 83, 48);
+        buffString(31, 2,
+            badgy_txt,
+            &main_buff);
+        buffString(41, 10,
+                    bird_txt,
+                    &main_buff);
+        bird_idle_buff.pixels = bird_flap;
+        //setup paused screen
+        collision = blitBuff_toBuff_collision(&bird_idle_buff, &main_buff,
+                                                20, (unsigned char) bird_y,
+                                                ALPHA );
+        blitBuff_opt(&main_buff, 0, 0);
 
-        //apply velocity
-        bird_y += bird_y_vel;
-        
-        if(bird_y_vel>0)
-            bird_idle_buff.pixels = bird_idle;
-        else
-            bird_idle_buff.pixels = bird_flap;
-
-        if(bird_y >= 35)
+    }
+    else if(b_state->counter_2 == 1)
+    {
+        if ( button_pressed == 250 )
         {
-            bird_y_vel = 0;
+            b_state->counter_2++;
+            button_pressed++;
+            y_acc_mag = -7;
+            y_acc_length = 7;
             b_state->counter_1 = 0;
-            bird_y = 35;
         }
-        else
-            b_state->counter_1++;
-        b_state->big_counter = 0;
-        
-        //if(pipe_rate_cnt++ == PIPE_RATE)
+    }
+    else
+    {
+        if ( button_pressed == 250 )
         {
-            if(pipe_loc.x == 0)
+            button_pressed++;
+            y_acc_mag = -7;
+            y_acc_length = 7;
+            b_state->counter_1 = 0;
+        }
+
+         if(b_state->big_counter++ > BIRD_RATE)
+         {
+             if(collision)
+             {
+//                start_state.next_state = &start_state;
+//                b_state->next_state = &start_state;
+                b_state->counter_2 = 0;
+                b_state->counter_1 = 0;
+                b_state->big_counter = 0;
+                
+             }
+
+            clear_screen_buff();
+            fill_buff(&main_buff, 0x00);
+
+            //need to apply flap accel?
+            if( y_acc_length && y_acc_mag)
             {
-                pipe_loc.x = 83 - PIPE_W - 1;
-                pipe_loc.y = opening_height;
+                y_acc_length--;
+                y_acc_mag++;
+                bird_y_vel = (G_ACC + y_acc_mag + b_state->counter_1);
+            }
+            //falling bird
+            else
+            {
+                bird_y_vel += (G_ACC + b_state->counter_1);
             }
 
-            pipe_loc.y = 1;
-            fill_buff_area(pipe_loc, PIPE_W, opening_height - PIPE_H,
-                               0xff, &main_buff);
+            //apply velocity
+            bird_y += bird_y_vel;
 
-            pipe_loc.y = opening_height;
-            //bottom part of pipe
-            fill_buff_area(pipe_loc, PIPE_W, 48 - pipe_loc.y - 1,
-                                0xff, &main_buff);
+            if(bird_y_vel>0)
+                bird_idle_buff.pixels = bird_idle;
+            else
+                bird_idle_buff.pixels = bird_flap;
 
-            pipe_loc.y = opening_height;
-            pipe_loc.x--;
-            pipe_rate_cnt = 0;
+            if(bird_y >= 35)
+            {
+                collision |= 1;
+                bird_y_vel = 0;
+//                b_state->counter_1 = 0;
+//                bird_y = BIRD_ST_HIEGHT;
+            }
+            else
+                b_state->counter_1++;
+            b_state->big_counter = 0;
+
+            //if(pipe_rate_cnt++ == PIPE_RATE)
+            {
+                if(pipe_loc.x == 0)
+                {
+                    pipe_loc.x = 83 - PIPE_W - 1;
+                    pipe_loc.y = opening_height;
+                }
+
+                pipe_loc.y = 1;
+                fill_buff_area(pipe_loc, PIPE_W, opening_height - PIPE_H,
+                                   0xff, &main_buff);
+
+                pipe_loc.y = opening_height;
+                //bottom part of pipe
+                fill_buff_area(pipe_loc, PIPE_W, 48 - pipe_loc.y - 1,
+                                    0xff, &main_buff);
+
+                pipe_loc.y = opening_height;
+                pipe_loc.x--;
+                pipe_rate_cnt = 0;
+            }
+            //draw_square(&main_buff, loc, 83, 48);
+            collision |= blitBuff_toBuff_collision(&bird_idle_buff, &main_buff,
+                                                // 20, 24, ALPHA );
+                                                20, (unsigned char) bird_y, ALPHA );
+            blitBuff_opt(&main_buff, 0, 0);
         }
-        //draw_square(&main_buff, loc, 83, 48);
-        collision = blitBuff_toBuff_collision(&bird_idle_buff, &main_buff,
-                                            // 20, 24, ALPHA );
-                                            20, (unsigned char) bird_y, ALPHA );
-        blitBuff_opt(&main_buff, 0, 0);
-        //blitBuff_opt(&bird_idle_buff, 20, (unsigned char) bird_y, ALPHA);
     }
 }
 
