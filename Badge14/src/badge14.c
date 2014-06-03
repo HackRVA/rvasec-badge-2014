@@ -52,6 +52,7 @@ void initBadgeState(struct BadgeState *b_state)
     b_state->counter_1 = 0;
     b_state->counter_2 = 0;
     b_state->big_counter = 0;
+    b_state->big_counter_1 = 0;
 }
 
 //initialize all the things
@@ -98,7 +99,7 @@ const char screen_saver_txt[] = "SCREEN SAVER" ,
 //main_page.entries;
 struct BadgeState snake_state, sketch_state, manual_contrast_state,
                     bird_state, schedule_browse_state, set_time_state,
-                    image_viewer_state;
+                    image_viewer_state, screen_saver_setup_state;
 
 void initGFX(void)
 {
@@ -265,7 +266,7 @@ void setupMenus(void)
     more_settings_entries[0] = &screen_saver_e;
         screen_saver_e.text = screen_saver_txt;
         screen_saver_e.menu_entry = 0;
-        screen_saver_e.state_entry = 0;
+        screen_saver_e.state_entry = &screen_saver_setup_state;
 
     more_settings_entries[1] = &back_to_settings;
         back_to_settings.text = go_back;
@@ -309,6 +310,10 @@ void setupStates(void)
     initBadgeState(&image_viewer_state);
         image_viewer_state.state_handler = image_viewer;
         image_viewer_state.next_state = &image_viewer_state;
+
+    initBadgeState(&screen_saver_setup_state);
+        screen_saver_setup_state.state_handler = setup_screen_saver;
+        screen_saver_setup_state.next_state = &screen_saver_setup_state;
 }
 
 struct BadgeState* Init_Game(void)
@@ -337,15 +342,7 @@ struct BadgeState* Init_Game(void)
     start_state.dt.mday=0x05;
     start_state.dt.mon=0x06;
     start_state.dt.year=0x14;
-//    tm.l=0;
-//    tm.sec=0x00;
-//    tm.min=0x00;
-//    tm.hour=0x08;
-//
-//    dt.wday=4;
-//    dt.mday=0x05;
-//    dt.mon=0x06;
-//    dt.year=0x14;
+
     setupRTCC();
     RtccSetTimeDate(start_state.tm.l, start_state.dt.l);
     return (struct BadgeState *)&start_state;
@@ -2206,28 +2203,131 @@ void* image_viewer(struct BadgeState *b_state)
     if(redraw)
     {
         blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
-//        struct coord loc;
-//        loc.x = 0;
-//        loc.y = 0;
-//        char start_time[5], end_time[5];
-//        fill_buff(&main_buff, 0x00);
-//        intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
-//        intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
-//
-//        draw_square(&main_buff, loc, 83, 11);
-//
-//        buffString(1, 2,
-//                    start_time,
-//                    &main_buff);
-//
-//        buffString(48, 2,
-//                    end_time,
-//                    &main_buff);
-//
-//        buffString(0, 14,
-//            conf_events_d1[b_state->counter_2].title,
-//                    &main_buff);
-//
-//        blitBuff_opt(&main_buff, 0, 0);
+    }
+}
+
+#define DELAY_INTERVAL 50000
+void* setup_screen_saver(struct BadgeState *b_state)
+{
+    static unsigned char num_images = 0, selecting = 0, cnt = 0;
+    unsigned char redraw = 0;
+    b_state->slide_handler(&b_state->slide_states);
+
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+
+    if( b_state->big_counter)
+    {
+        b_state->big_counter--;
+        if(!b_state->big_counter)
+            redraw = 1;
+    }
+
+    if(!b_state->counter_1)
+    {
+        b_state->big_counter_1 = 0;
+        //selecting = 0;
+        redraw = 1;
+        b_state->counter_1++;
+        //b_state->big_counter_1 = 0;
+        b_state->next_state = b_state;
+
+        if(!b_state->counter_2)
+            b_state->counter_2++;
+    }
+
+    if(bt_swipe < 0 && b_state->counter_2 < NUM_IMAGE_ASSETS)
+    {
+        b_state->counter_2++;
+        redraw = 1;
+    }
+
+    if(bt_swipe > 0 && b_state->counter_2 > 0)
+    {
+        b_state->counter_2--;
+        redraw = 1;
+    }
+    if ( button_pressed == 250)
+    {
+        button_pressed++;
+
+        //go to next step in the setup
+        if(b_state->big_counter_1 == 0)
+        {
+            fill_buff(&main_buff, 0x00);
+            b_state->big_counter_1 = 1;
+            char num_images_str[] = "99";
+
+            setBase10String(num_saver_imgs, num_images_str);
+            buffString(10, 9,
+                        "SELECTED:",
+                        &main_buff);
+
+            buffString(68, 9,
+                        num_images_str,
+                        &main_buff);
+            b_state->big_counter = DELAY_INTERVAL;
+            b_state->counter_2 = 0;
+            redraw = 1;
+            selecting = 0;
+        }
+        else if(b_state->big_counter_1 == 1)
+        {
+            screen_saver_imgs[selecting] = &screen_images[b_state->counter_2];
+            selecting++;
+            if(selecting > (num_saver_imgs - 1))
+            {
+                //b_state->big_counter_1++;
+                b_state->big_counter_1 = 0;
+                fill_buff(&main_buff, 0x00);
+                start_state.next_state = &start_state;
+                b_state->next_state = &start_state;
+                b_state->counter_1 = 0;
+                return;
+            }
+        }
+    }
+    
+    if(redraw)
+    {
+        if(b_state->big_counter_1 == 0)
+        {
+            //b_state->counter_2 = 0;
+            fill_buff(&main_buff, 0x00);
+
+            if(b_state->counter_2 == 0)
+                b_state->counter_2++;
+
+            num_saver_imgs = b_state->counter_2;
+            char num_images_str[] = "99";
+
+            setBase10String(num_saver_imgs, num_images_str);
+            buffString(17, 9,
+                        "HOW MANY",
+                        &main_buff);
+
+            buffString(21, 16,
+                        "IMAGES",
+                        &main_buff);
+            
+            buffString(37, 29,
+                        num_images_str,
+                        &main_buff);
+            blitBuff_opt(&main_buff, 0, 0);
+        }
+        else if(b_state->big_counter_1 == 1 && !b_state->big_counter)
+        {
+
+            if(b_state->counter_2 > NUM_IMAGE_ASSETS - 1)
+                b_state->counter_2 = NUM_IMAGE_ASSETS - 1;
+
+             //shit, this call seems to overrun and whipe out num_images
+//            blitBuff_toBuff(&screen_images[b_state->counter_2].buff,
+//                            &main_buff,
+//                            0, 0, OPAQUE);
+            blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
+            b_state->big_counter_1 = 1;            
+        }
+        
     }
 }

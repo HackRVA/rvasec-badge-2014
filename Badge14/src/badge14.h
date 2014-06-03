@@ -26,6 +26,12 @@ unsigned char button_pressed, button_cnt, button_used;
 
 struct image screen_images[NUM_IMAGE_ASSETS];
 
+static unsigned char num_saver_imgs = 0;
+static struct image *screen_saver_imgs[NUM_IMAGE_ASSETS];
+//all this memory just for dynamic image switch times
+static unsigned char pause_times[NUM_IMAGE_ASSETS];
+
+
 // touch states
 struct TouchState
 {
@@ -188,6 +194,7 @@ void* snake(struct BadgeState *b_state);
 void* badgy_bird(struct BadgeState *b_state);
 void* tunnelFlight(struct BadgeState *b_state);
 void* image_viewer(struct BadgeState *b_state);
+void* setup_screen_saver(struct BadgeState *b_state);
 
 
 void* debugStage(struct BadgeState *b_state);

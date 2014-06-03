@@ -413,6 +413,7 @@ void setTimeString(b_rtccTime time, char *t_string)
 //    t_string[4] = 48 + ((time.min      ) & 0xF);
 }
 
+
 void setBase10String(unsigned char num, char *t_string)
 {
     t_string[0] = 48 + ((num >>  4) & 0xF);

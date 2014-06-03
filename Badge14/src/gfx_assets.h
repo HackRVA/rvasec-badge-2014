@@ -1,7 +1,7 @@
 /* 
  * File:   gfx_assets.h
  * Author: morgan
- * The_Pacifist, why u no come to conference? Thesis can wait!
+ * 
  * Created on June 3, 2014, 12:41 PM
  */
 
