@@ -61,30 +61,37 @@ struct menu_entry *main_entries[3], games, schedule, settings, sketch, adventure
 
 //extra element for back button
 struct menu_entry *game_entries[5], snake_e, bird_e, pong_e;
-struct menu_entry *settings_entries[5], backlight, contrast, set_time, speaker;
+struct menu_entry *settings_entries[6], backlight, contrast, set_time, speaker,
+                    more_settings_e;
+struct menu_entry *more_settings_entries[1], screen_saver_e;
 struct menu_entry back_to_main;
 
-struct menu_page *current_menu, main_page, games_page, settings_page, schedule_page;
+struct menu_page *current_menu, main_page, games_page, settings_page, 
+                  schedule_page, more_settings_page;
 
 //main menu texts
-char game_txt[] = "DIVERSIONS",
-        schedule_txt[] = "SCHEDULE",
-        settings_txt[] = "SETTINGS";
+const char game_txt[] = "DIVERSIONS",
+           schedule_txt[] = "SCHEDULE",
+           settings_txt[] = "SETTINGS";
 
 //games menu texts
-char snake_txt[] = "SNAKE",
-        adventure_txt[] = "ADVENTURE",
-        sketch_txt[] = "SKETCH",
-        bird_txt[] = "BADGY BIRD",
-        pong_txt[] = "PONG";
+const char snake_txt[] = "SNAKE",
+           adventure_txt[] = "ADVENTURE",
+           sketch_txt[] = "SKETCH",
+           bird_txt[] = "BADGY BIRD",
+           pong_txt[] = "PONG";
 
 //settings menu text
-char set_backlight[] = "BACKLIGHT",
-        adjust_contrast[] = "CONTRAST",
-        enable_speaker[] = "SPEAKER",
-        set_time_txt[] = "SET TIME";
+const char set_backlight[] = "BACKLIGHT",
+           adjust_contrast[] = "CONTRAST",
+           enable_speaker[] = "SPEAKER",
+           set_time_txt[] = "SET TIME";
 
-char go_back[] = "<-[BACK]";
+//
+const char screen_saver_txt[] = "SCREEN SAVER" ,
+           go_back[] = "<-[BACK]",
+           more_txt[] = "[MORE]";
+
 //main_page.entries;
 struct BadgeState snake_state, sketch_state, manual_contrast_state,
                     bird_state, schedule_browse_state, set_time_state;
@@ -99,6 +106,17 @@ void initGFX(void)
     bird_idle_buff.height = 11;
     bird_idle_buff.width = 15;
 
+    //the doge
+    screen_images[0].name = doge_txt;
+    screen_images[0].buff.pixels = doge;
+    screen_images[0].buff.height = 48;
+    screen_images[0].buff.width = 84;
+
+    //grumpy cat
+    screen_images[1].name = grump_txt;
+    screen_images[1].buff.pixels = grump;
+    screen_images[1].buff.height = 48;
+    screen_images[1].buff.width = 84;
 }
 
 void setupMenus(void)
@@ -166,7 +184,7 @@ void setupMenus(void)
 
     //-----------------------
     // setup SETTINGS
-    settings_page.num_entries = 5;
+    settings_page.num_entries = 6;
     settings_page.selected = 0;
     settings_page.entries = settings_entries;
 
@@ -190,10 +208,26 @@ void setupMenus(void)
         set_time.menu_entry = 0;
         set_time.state_entry = &set_time_state;
 
-    settings_entries[4] = &back_to_main;
+    settings_entries[4] = &more_settings_e;
+        more_settings_e.text = more_txt;
+        more_settings_e.menu_entry = &more_settings_page;
+        more_settings_e.state_entry = 0;
+
+    settings_entries[5] = &back_to_main;
         back_to_main.text = go_back;
         back_to_main.menu_entry = &main_page;
         back_to_main.state_entry = 0;
+
+    //-----------------------
+    // setup MORE SETTINGS
+    more_settings_page.num_entries = 1;
+    more_settings_page.selected = 0;
+    more_settings_page.entries = more_settings_entries;
+
+    more_settings_entries[0] = &screen_saver_e;
+        screen_saver_e.text = screen_saver_txt;
+        screen_saver_e.menu_entry = 0;
+        screen_saver_e.state_entry = 0;
 }
 
 void setupStates(void)
@@ -223,7 +257,6 @@ void setupStates(void)
     initBadgeState(&schedule_browse_state);
         schedule_browse_state.state_handler = browse_schedule;
         schedule_browse_state.next_state = &schedule_browse_state;
-
 
     initBadgeState(&set_time_state);
         set_time_state.state_handler = adjust_time;

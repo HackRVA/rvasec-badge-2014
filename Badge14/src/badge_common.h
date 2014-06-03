@@ -56,6 +56,12 @@ struct pix_buff
     //BLIT_STYLE blit_method;
 };
 
+struct image
+{
+    char *name;
+    struct pix_buff buff;
+};
+
 struct coord
 {
     unsigned char x, y;

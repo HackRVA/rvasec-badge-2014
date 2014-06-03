@@ -279,7 +279,7 @@
         <property key="extra-lib-directories" value=""/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-cross-reference-file" value="true"/>
-        <property key="heap-size" value="512"/>
+        <property key="heap-size" value="256"/>
         <property key="input-libraries" value=""/>
         <property key="linker-symbols" value=""/>
         <property key="map-file" value="mappit"/>
@@ -289,7 +289,7 @@
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="false"/>
         <property key="report-memory-usage" value="false"/>
-        <property key="stack-size" value="512"/>
+        <property key="stack-size" value="1024"/>
         <property key="symbol-stripping" value=""/>
         <property key="trace-symbols" value=""/>
         <property key="warn-section-align" value="false"/>
