@@ -57,12 +57,15 @@ int CheckRtccRunning(int secWait);
 // WDT OFF
 // Other options are don't care
 //
+
+#ifdef FOR_REFERENCE_ONLY
+
 //#pragma config FPLLMUL = MUL_20, FPLLIDIV = DIV_2, FPLLODIV = DIV_1, FWDTEN = OFF
 //#pragma config POSCMOD = HS, FNOSC = PRIPLL, FPBDIV = DIV_1
 
-#define SYS_FREQ 		(80000000L)
+#endif
 
-
+#define SYS_FREQ 		(20000000L)
 
 /*********************************************************************
  * Function:        int main(void)
@@ -88,58 +91,40 @@ int setupRTCC(void)
 	// Given the options, this function will change the flash wait states, RAM
 	// wait state and enable prefetch cache but will not change the PBDIV.
 	// The PBDIV value is already set via the pragma FPBDIV option above..
-	SYSTEMConfig(SYS_FREQ, SYS_CFG_WAIT_STATES | SYS_CFG_PCACHE);
+
+	// SYSTEMConfig(SYS_FREQ, SYS_CFG_WAIT_STATES | SYS_CFG_PCACHE);
 
 	RtccInit();			// init the RTCC
 	while(RtccGetClkStat()!=RTCC_CLK_ON);	// wait for the SOSC to be actually running and RTCC to have its clock source
 							// could wait here at most 32ms
 
-	// when using the RtccSetTimeDate() function, the write operation is enabled if needed and then restored to the initial value
-	// so that we don't have to worry about calling RtccWrEnable()/RtccWrDisable() functions
-
-	// let's start setting the current date
-	{
-		// one way to do it
 		tm.l=0;
 		tm.sec=0x30;
 		tm.min=0x07;
 		tm.hour=0x10;
 
 		dt.wday=2;
-		dt.mday=0x16;
-		dt.mon=0x01;
-		dt.year=0x07;
+		dt.mday=0x02;
+		dt.mon=0x06;
+		dt.year=0x14;
 		RtccSetTimeDate(tm.l, dt.l);
-	}
-	// however, much easier to do it should be:
-	RtccSetTimeDate(0x10073000, 0x07011602);	// time is MSb: hour, min, sec, rsvd. date is MSb: year, mon, mday, wday.
+
+	//RtccSetTimeDate(0x21140000, 0x14060201);	// time is MSb: hour, min, sec, rsvd. date is MSb: year, mon, mday, wday.
 												// please note that the rsvd field has to be 0 in the time field!
+	RtccSetCalibration(0);	// value to calibrate with at each minute
 
-	// NOTE: at this point the writes to the RTCC time and date registers are disabled
-
-	// we can also read the time and date
-	tm1.l=RtccGetTime();
-	dt1.l=RtccGetDate();
-	// can check that the time and date are the ones we just set
-	if(tm.hour!=tm1.hour ||tm.min!=tm1.min)
-	{
-		return 0;
-	}
-	if(dt.l!=dt1.l)		// check for proper date
-	{
-		return 0;
-	}
-	// we can read the time and date in a single operation
-	RtccGetTimeDate(&tm1, &dt1);
+	//tm1.l=RtccGetTime();
+	//dt1.l=RtccGetDate();
+	//RtccGetTimeDate(&tm1, &dt1);
 
 	// now that we know the RTCC clock is up and running, it's easier to start from fresh:
-	RtccOpen(tm.l, dt.l, 0);	// set time, date and calibration in a single operation
+	//RtccOpen(tm.l, dt.l, 0);	// set time, date and calibration in a single operation
 
 	// check that the RTCC is running
-	if(!CheckRtccRunning(3))
-	{
-		return 0;
-	}
+	//if(!CheckRtccRunning(3))
+	//{
+		//return 0;
+	//}
 
 	// another way to see the RTCC is tunning: check the SYNC bit
 	while(RtccGetSync());	// wait sync to be low
@@ -150,12 +135,11 @@ int setupRTCC(void)
 	// other RTCC operations
 
 	// adjust the RTCC timing
-	RtccSetCalibration(200);	// value to calibrate with at each minute
 
 	// enabling the RTCC output pin
-	RtccSelectPulseOutput(1);		// select the seconds clock pulse as the function of the RTCC output pin
-	RtccSelectPulseOutput(0);		// select the alarm pulse as the function of the RTCC output pin
-	RtccOutputEnable(1);			// enable the Output pin of the RTCC
+	//RtccSelectPulseOutput(1);		// select the seconds clock pulse as the function of the RTCC output pin
+	//RtccSelectPulseOutput(0);		// select the alarm pulse as the function of the RTCC output pin
+	//RtccOutputEnable(1);			// enable the Output pin of the RTCC
 
 
 	return 1;
