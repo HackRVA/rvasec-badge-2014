@@ -243,6 +243,19 @@ void setupStates(void)
 
 struct BadgeState* Init_Game(void)
 {
+    b_rtccTime tm;
+    b_rtccDate dt;
+
+    tm.l=0;
+    tm.sec=0x00;
+    tm.min=0x00;
+    tm.hour=0x08;
+
+    dt.wday=4;
+    dt.mday=0x05;
+    dt.mon=0x06;
+    dt.year=0x14;
+
     LATBbits.LATB7 = 1;
     button_pressed = button_cnt = button_used = 0;
     btm_size = side_size = 0;
@@ -256,6 +269,7 @@ struct BadgeState* Init_Game(void)
     initConferenceEvents();
 
     setupRTCC();
+    RtccSetTimeDate(tm.l, dt.l);
     return (struct BadgeState *)&start_state;
     //return &bird_state;
 }
@@ -1787,8 +1801,8 @@ void* draw_main_ticker(struct BadgeState *b_state)
         intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
         intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
 
-        draw_square(&main_buff, loc, 83, 11);
-
+//        draw_square(&main_buff, loc, 83, 11);
+        draw_square(&main_buff, loc, 34, 11);
         buffString(1, 39,
             start_time,
                     &main_buff);
@@ -1818,6 +1832,12 @@ void* draw_main_ticker(struct BadgeState *b_state)
         buffString(48, 39,
                     now_time,
                     &main_buff);
+
+        invertBuffArea(47 ,
+                        36,
+                         33,
+                         11,
+                         &main_buff);
 
         buffString_trunc(0, 28,
                         conf_events_d1[b_state->counter_2].title,
