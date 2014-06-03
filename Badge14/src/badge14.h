@@ -85,8 +85,14 @@ struct TouchQueue
     struct TouchState back;
 };
 
+//b_rtccTime tm;
+//b_rtccDate dt;
+
 struct BadgeState
 {
+    b_rtccTime tm;
+    b_rtccDate dt;
+
     //create a linked list type structure, should allow use to build some
     //complex sequences with limited global var use
     struct BadgeState *next_state;
@@ -171,6 +177,7 @@ void* welcome(struct BadgeState *b_state);
 void* main_menu(struct BadgeState *b_state);
 void* menu_maker(struct BadgeState *b_state);
 void* manual_contrast(struct BadgeState *b_state);
+void* adjust_time(struct BadgeState *b_state);
 
 void* sliderPlay(struct BadgeState *b_state);
 void* snake(struct BadgeState *b_state);

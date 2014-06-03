@@ -401,3 +401,50 @@ unsigned char check_buffer_collisions(struct pix_buff *src_buff,
     }
     return found;
 }
+
+void setTimeString(b_rtccTime time, char *t_string)
+{
+//    t_string[0] = 48 + ((time.hour >>  4) & 0xF);
+//    t_string[1] = 48 + ((time.hour      ) & 0xF);
+    setBase10String(time.hour, t_string);
+    t_string[2] = ':';
+    setBase10String(time.min, &t_string[3]);
+//    t_string[3] = 48 + ((time.min >>  4) & 0xF);
+//    t_string[4] = 48 + ((time.min      ) & 0xF);
+}
+
+void setBase10String(unsigned char num, char *t_string)
+{
+    t_string[0] = 48 + ((num >>  4) & 0xF);
+    t_string[1] = 48 + ((num) & 0xF);
+}
+
+void bcdDecrement(unsigned char *num)
+{
+    //not wrapping around
+    if( (*num &0xF) != 0)
+    {
+        //don't touch top bits, but subtract from bottom
+        *num = (*num & 0xf0) | ((*num-1) & 0xf);
+    }
+    else
+    {
+        //shift down and subtract one, don't want carry, shift back
+        *num = (((*num >> 4) - 1) & 0xf) << 4;
+        *num |= 0x9;
+    }
+}
+
+void bcdIncrement(unsigned char *num)
+{
+    //not wrapping around
+    if( (*num &0xF) != 9)
+    {
+        *num = (*num & 0xf0) | ((*num+1) & 0xf);
+    }
+    else
+    {
+        //shift down and add one, don't want carry, shift back
+        *num = (((*num >> 4) + 1) & 0xf) << 4;
+    }
+}

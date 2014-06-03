@@ -103,6 +103,10 @@ void LCDClear(void) ;
 void LCDInit(void) ;
 void LCDLogo();
 
+void setTimeString(b_rtccTime time, char *t_string);
+
+
+void setBase10String(unsigned char num, char *t_string);
 //void printTouchVals(void);
 //void itoa(unsigned char in_num,
 //          unsigned char *out_alpha);

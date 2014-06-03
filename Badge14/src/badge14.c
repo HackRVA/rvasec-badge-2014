@@ -61,7 +61,7 @@ struct menu_entry *main_entries[3], games, schedule, settings, sketch, adventure
 
 //extra element for back button
 struct menu_entry *game_entries[5], snake_e, bird_e, pong_e;
-struct menu_entry *settings_entries[4], backlight, contrast, speaker;
+struct menu_entry *settings_entries[5], backlight, contrast, set_time, speaker;
 struct menu_entry back_to_main;
 
 struct menu_page *current_menu, main_page, games_page, settings_page, schedule_page;
@@ -81,12 +81,13 @@ char snake_txt[] = "SNAKE",
 //settings menu text
 char set_backlight[] = "BACKLIGHT",
         adjust_contrast[] = "CONTRAST",
-        enable_speaker[] = "SPEAKER";
+        enable_speaker[] = "SPEAKER",
+        set_time_txt[] = "SET TIME";
 
 char go_back[] = "<-[BACK]";
 //main_page.entries;
 struct BadgeState snake_state, sketch_state, manual_contrast_state,
-                    bird_state, schedule_browse_state;
+                    bird_state, schedule_browse_state, set_time_state;
 
 void initGFX(void)
 {
@@ -102,28 +103,7 @@ void initGFX(void)
 
 void setupMenus(void)
 {
-    //setup states
-    initBadgeState(&sketch_state);
-        sketch_state.state_handler = sliderPlay;
-        sketch_state.next_state = &sketch_state;
 
-    initBadgeState(&manual_contrast_state);
-        manual_contrast_state.state_handler = manual_contrast;
-        manual_contrast_state.next_state = &manual_contrast_state;
-
-    initBadgeState(&snake_state);
-        snake_state.state_handler = snake;
-        snake_state.next_state = &snake_state;
-
-    initBadgeState(&bird_state);
-        bird_state.state_handler = badgy_bird;
-        bird_state.next_state = &bird_state;
-        bird_state.slide_handler = basicSlide;
-
-    initBadgeState(&schedule_browse_state);
-        schedule_browse_state.state_handler = browse_schedule;
-        schedule_browse_state.next_state = &schedule_browse_state;
-        
     current_menu = &main_page;
 
     //-----------------------
@@ -186,7 +166,7 @@ void setupMenus(void)
 
     //-----------------------
     // setup SETTINGS
-    settings_page.num_entries = 4;
+    settings_page.num_entries = 5;
     settings_page.selected = 0;
     settings_page.entries = settings_entries;
 
@@ -205,7 +185,12 @@ void setupMenus(void)
         speaker.menu_entry = 0;
         speaker.state_entry = 0;
 
-    settings_entries[3] = &back_to_main;
+    settings_entries[3] = &set_time;
+        set_time.text = set_time_txt;
+        set_time.menu_entry = 0;
+        set_time.state_entry = &set_time_state;
+
+    settings_entries[4] = &back_to_main;
         back_to_main.text = go_back;
         back_to_main.menu_entry = &main_page;
         back_to_main.state_entry = 0;
@@ -238,23 +223,17 @@ void setupStates(void)
     initBadgeState(&schedule_browse_state);
         schedule_browse_state.state_handler = browse_schedule;
         schedule_browse_state.next_state = &schedule_browse_state;
-        
+
+
+    initBadgeState(&set_time_state);
+        set_time_state.state_handler = adjust_time;
+        set_time_state.next_state = &set_time_state;
 }
 
 struct BadgeState* Init_Game(void)
 {
-    b_rtccTime tm;
-    b_rtccDate dt;
-
-    tm.l=0;
-    tm.sec=0x00;
-    tm.min=0x00;
-    tm.hour=0x08;
-
-    dt.wday=4;
-    dt.mday=0x05;
-    dt.mon=0x06;
-    dt.year=0x14;
+//    b_rtccTime tm;
+//    b_rtccDate dt;
 
     LATBbits.LATB7 = 1;
     button_pressed = button_cnt = button_used = 0;
@@ -268,15 +247,44 @@ struct BadgeState* Init_Game(void)
     setupMenus();
     initConferenceEvents();
 
+    start_state.tm.l=0;
+    start_state.tm.sec=0x00;
+    start_state.tm.min=0x00;
+    start_state.tm.hour=0x08;
+
+    start_state.dt.wday=4;
+    start_state.dt.mday=0x05;
+    start_state.dt.mon=0x06;
+    start_state.dt.year=0x14;
+//    tm.l=0;
+//    tm.sec=0x00;
+//    tm.min=0x00;
+//    tm.hour=0x08;
+//
+//    dt.wday=4;
+//    dt.mday=0x05;
+//    dt.mon=0x06;
+//    dt.year=0x14;
     setupRTCC();
-    RtccSetTimeDate(tm.l, dt.l);
+    RtccSetTimeDate(start_state.tm.l, start_state.dt.l);
     return (struct BadgeState *)&start_state;
     //return &bird_state;
 }
 
+//update clock every T_UPDATE_DELTA iterations
+#define T_UPDATE_DELTA 20000
 void Run_Game(struct BadgeState **state)
 {
+    static unsigned int cnt = 0;
     *state = (*state)->next_state;
+
+    //don't need to update too often
+    if( cnt++ == T_UPDATE_DELTA)
+    {
+        cnt = 0;
+        (*state)->tm.l = get_time();
+    }
+
     //run the state
     (*state)->state_handler(*state);
 }
@@ -839,8 +847,8 @@ void* touchCalibrate(struct BadgeState *b_state)
     }
     else
     {
-        LCDClear();
-        LCDLogo();
+//        LCDClear();
+//        LCDLogo();
 
         b_state->big_counter
             = b_state->counter_1
@@ -1796,7 +1804,7 @@ void* draw_main_ticker(struct BadgeState *b_state)
         loc.y = 36;
         char start_time[5], end_time[5], now_time[] = "11:11";
 
-        current_time.l = get_time();
+        //current_time.l = get_time();
         //current_time.l = 0x21140000;
         intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
         intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
@@ -1820,11 +1828,20 @@ void* draw_main_ticker(struct BadgeState *b_state)
 //        now_time[6] = hextab[(current_time.sec >>  4) & 0xF];
 //        now_time[7] = hextab[(current_time.sec      ) & 0xF];
 
-        now_time[0] = 48 + ((current_time.hour >>  4) & 0xF);
-        now_time[1] = 48 + ((current_time.hour      ) & 0xF);
-        now_time[2] = ':';
-        now_time[3] = 48 + ((current_time.min >>  4) & 0xF);
-        now_time[4] = 48 + ((current_time.min      ) & 0xF);
+//        now_time[0] = 48 + ((current_time.hour >>  4) & 0xF);
+//        now_time[1] = 48 + ((current_time.hour      ) & 0xF);
+//        now_time[2] = ':';
+//        now_time[3] = 48 + ((current_time.min >>  4) & 0xF);
+//        now_time[4] = 48 + ((current_time.min      ) & 0xF);
+
+        setTimeString(b_state->tm, now_time);
+//        now_time[0] = 48 + ((b_state->tm.hour >>  4) & 0xF);
+//        now_time[1] = 48 + ((b_state->tm.hour      ) & 0xF);
+//        now_time[2] = ':';
+//        now_time[3] = 48 + ((b_state->tm.min >>  4) & 0xF);
+//        now_time[4] = 48 + ((b_state->tm.min      ) & 0xF);
+
+
 //        now_time[5] = '.';
 //        now_time[6] = 48 + ((current_time.sec >>  4) & 0xF);
 //        now_time[7] = 48 + ((current_time.sec      ) & 0xF);
@@ -1845,9 +1862,7 @@ void* draw_main_ticker(struct BadgeState *b_state)
                         11,
                         "...",
                     &main_buff);
-
     }
-
 }
 
 void printTouchVals(unsigned char btm, unsigned char side)
@@ -1961,6 +1976,113 @@ void* browse_schedule(struct BadgeState *b_state)
             conf_events_d1[b_state->counter_2].title,
                     &main_buff);
 
+        blitBuff_opt(&main_buff, 0, 0);
+    }
+}
+
+void* adjust_time(struct BadgeState *b_state)
+{
+    unsigned char redraw = 0;
+    static unsigned char hour = 0x08, min = 0x00;
+    b_state->slide_handler(&b_state->slide_states);
+
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+    
+    if(!b_state->counter_1)
+    {
+        redraw = 1;
+        b_state->counter_1++;
+        b_state->next_state = b_state;
+    }
+
+    if(bt_swipe < 0)// && b_state->counter_2 < NUM_EVENTS - 1)
+    {
+        if(b_state->counter_1 ==  1 && hour < 24)
+            //hour++;
+            bcdIncrement(&hour);
+        else if (b_state->counter_1 ==  2 && min < 60)
+            //min++;
+            bcdIncrement(&min);
+        //b_state->counter_2++;
+        redraw = 1;
+    }
+
+    if(bt_swipe > 0)// && b_state->counter_2 > 0)
+    {
+        if(b_state->counter_1 ==  1 && hour > 0)
+            //hour--;
+            bcdDecrement(&hour);
+        else if (b_state->counter_1 ==  2 && min > 0)
+            //min--;
+            bcdDecrement(&min);
+        //b_state->counter_2--;
+        redraw = 1;
+    }
+
+    if(lr_swipe > 0)
+    {
+        if(b_state->counter_1 == 1)
+            b_state->counter_1 = 2;
+        redraw = 1;
+    }
+
+    if(lr_swipe < 0)
+    {
+        if(b_state->counter_1 == 2)
+            b_state->counter_1 = 1;
+        redraw = 1;
+    }
+
+    if ( button_pressed == 250)
+    {
+        b_state->tm.hour = hour;
+        b_state->tm.min = min;
+        RtccSetTimeDate(b_state->tm.l, b_state->dt.l);
+        button_pressed++;
+        fill_buff(&main_buff, 0x00);
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        b_state->counter_1 = 0;
+    }
+    if(redraw)
+    {
+        struct coord loc;
+        loc.x = 0;
+        loc.y = 0;
+        unsigned char inv_x, inv_y = 2;
+        char hours[] = "99", minutes[] = "99";
+        fill_buff(&main_buff, 0x00);
+
+        setBase10String(hour, hours);
+        setBase10String(min, minutes);
+
+        draw_square(&main_buff, loc, 83, 11);
+
+        buffString(24, 2,
+                    hours,
+                    &main_buff);
+
+        buffString(48, 2,
+                    minutes,
+                    &main_buff);
+
+        //hour selected
+        if(b_state->counter_1 == 1)
+        {
+            inv_x = 23;
+        }
+        else if (b_state->counter_1 == 2)
+        {
+            inv_x = 47;
+        }
+
+        invertBuffArea(inv_x ,
+                        inv_y,
+                         13,
+                         6,
+                         &main_buff);
+        
         blitBuff_opt(&main_buff, 0, 0);
     }
 }
