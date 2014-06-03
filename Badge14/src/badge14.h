@@ -138,6 +138,8 @@ void Run_Game(struct BadgeState **state);
 void initQueue(struct Queue *queue);
 void updateQueue(struct Queue queue, void *item );
 void initGFX(void);
+void setupMenus(void);
+void setupStates(void);
 
 void initTouchState(struct TouchState *t_state);
 void initBadgeState(struct BadgeState *b_state);

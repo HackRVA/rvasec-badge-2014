@@ -1,7 +1,8 @@
 #include "badge_common.h"
 #include "badge14.h"
 #include "schedule.h"
-
+//const char hextab[]={"0123456789ABCDEF"};
+extern char *hextab;
 extern char gContrast;
 unsigned char pix[504] = {0};
 //dont need both in prod, debugging now
@@ -210,33 +211,51 @@ void setupMenus(void)
         back_to_main.state_entry = 0;
 }
 
+void setupStates(void)
+{
+    initBadgeState(&start_state);
+        start_state.next_state = &start_state;
+        start_state.state_handler = touchCalibrate;//main_menu;//tunnelFlight; // //
+        start_state.slide_handler = autoSlide;
+        
+    initBadgeState(&sketch_state);
+        sketch_state.state_handler = sliderPlay;
+        sketch_state.next_state = &sketch_state;
+
+    initBadgeState(&manual_contrast_state);
+        manual_contrast_state.state_handler = manual_contrast;
+        manual_contrast_state.next_state = &manual_contrast_state;
+
+    initBadgeState(&snake_state);
+        snake_state.state_handler = snake;
+        snake_state.next_state = &snake_state;
+
+    initBadgeState(&bird_state);
+        bird_state.state_handler = badgy_bird;
+        bird_state.next_state = &bird_state;
+        bird_state.slide_handler = basicSlide;
+
+    initBadgeState(&schedule_browse_state);
+        schedule_browse_state.state_handler = browse_schedule;
+        schedule_browse_state.next_state = &schedule_browse_state;
+        
+}
+
 struct BadgeState* Init_Game(void)
 {
-    //gContrast = 174;
-    LCDInit();
-    LCDClear();
-    initGFX();
-    //LCD_RVASec_Logo();
-    //LCDLogo();
-    //LCD backlight on
     LATBbits.LATB7 = 1;
     button_pressed = button_cnt = button_used = 0;
     btm_size = side_size = 0;
 
-    initBadgeState(&start_state);
+    LCDInit();
+    LCDClear();
+    initGFX();
+
+    setupStates();
     setupMenus();
     initConferenceEvents();
-    //struct BadgeState *start_state = (struct BadgeState*)malloc(sizeof(struct BadgeState));
 
-    //loooooooop
-    start_state.next_state = &start_state;
-
-    //start_state.state_handler = debugStage;
-    start_state.state_handler = touchCalibrate;//main_menu;//tunnelFlight; // //
-
-    start_state.slide_handler = autoSlide;
-
-
+    setupRTCC();
     return (struct BadgeState *)&start_state;
     //return &bird_state;
 }
@@ -1735,7 +1754,7 @@ void* badgy_bird(struct BadgeState *b_state)
 #define MAIN_TICKER_RATE 60000
 void* draw_main_ticker(struct BadgeState *b_state)
 {
-    static unsigned char ticker_i = 0, cnt;
+    //static unsigned char ticker_i = 0, cnt;
     
     b_state->big_counter_1++;
 
@@ -1757,11 +1776,14 @@ void* draw_main_ticker(struct BadgeState *b_state)
     //may result in duplicate redraws... w/e
     if(!b_state->counter_1)
     {
-
+        b_rtccTime current_time;
         struct coord loc;
         loc.x = 0;
         loc.y = 36;
-        char start_time[5], end_time[5];
+        char start_time[5], end_time[5], now_time[] = "11:11";
+
+        current_time.l = get_time();
+        //current_time.l = 0x21140000;
         intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
         intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
 
@@ -1771,8 +1793,30 @@ void* draw_main_ticker(struct BadgeState *b_state)
             start_time,
                     &main_buff);
 
+//        buffString(48, 39,
+//            end_time,
+//                    &main_buff);
+
+//        now_time[0] = hextab[((current_time.hour >>  4) & 0xF)];
+//        now_time[1] = hextab[(current_time.hour      ) & 0xF];
+//        now_time[2] = ':';
+//        now_time[3] = hextab[(current_time.min >>  4) & 0xF];
+//        now_time[4] = hextab[(current_time.min      ) & 0xF];
+//        now_time[5] = '.';
+//        now_time[6] = hextab[(current_time.sec >>  4) & 0xF];
+//        now_time[7] = hextab[(current_time.sec      ) & 0xF];
+
+        now_time[0] = 48 + ((current_time.hour >>  4) & 0xF);
+        now_time[1] = 48 + ((current_time.hour      ) & 0xF);
+        now_time[2] = ':';
+        now_time[3] = 48 + ((current_time.min >>  4) & 0xF);
+        now_time[4] = 48 + ((current_time.min      ) & 0xF);
+//        now_time[5] = '.';
+//        now_time[6] = 48 + ((current_time.sec >>  4) & 0xF);
+//        now_time[7] = 48 + ((current_time.sec      ) & 0xF);
+
         buffString(48, 39,
-            end_time,
+                    now_time,
                     &main_buff);
 
         buffString_trunc(0, 28,

@@ -11,6 +11,39 @@
 //#include "Compiler.h"
 //#include "HardwareProfile.h"
 
+int setupRTCC(void);
+unsigned long get_time(void);
+// union/structure for read/write of time into the RTCC device
+typedef union
+{
+	struct
+	{
+		unsigned char	rsvd;		// reserved for future use. should be 0
+		unsigned char	sec;		// BCD codification for seconds, 00-59
+		unsigned char	min;		// BCD codification for minutes, 00-59
+		unsigned char	hour;		// BCD codification for hours, 00-24
+	};								// field access
+	unsigned char		b[4];		// byte access
+	unsigned short		w[2];		// 16 bits access
+	unsigned long		l;			// 32 bits access
+}b_rtccTime;
+
+// union/structure for read/write of date into the RTCC device
+typedef union
+{
+	struct
+	{
+		unsigned char	wday;		// BCD codification for day of the week, 00-06
+		unsigned char	mday;		// BCD codification for day of the month, 01-31
+		unsigned char	mon;		// BCD codification for month, 01-12
+		unsigned char	year;		// BCD codification for years, 00-99
+	};								// field access
+	unsigned char		b[4];		// byte access
+	unsigned short		w[2];		// 16 bits access
+	unsigned long		l;			// 32 bits access
+}b_rtccDate;
+
+
 //#define byte unsigned char
 enum BLIT_STYLE {ZERO_ERASES, ZERO_ALPHA};
 struct pix_buff

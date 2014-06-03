@@ -146,6 +146,10 @@ int setupRTCC(void)
 }
 
 
+unsigned long get_time(void)
+{
+    return RtccGetTime();
+}
 
 /*********************************************************************
  * Function:        int CheckRtccRunning(int secWait)
