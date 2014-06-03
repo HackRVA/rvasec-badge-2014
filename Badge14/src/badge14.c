@@ -2270,6 +2270,7 @@ void* setup_screen_saver(struct BadgeState *b_state)
             b_state->counter_2 = 0;
             redraw = 1;
             selecting = 0;
+            blitBuff_opt(&main_buff, 0, 0);
         }
         else if(b_state->big_counter_1 == 1)
         {
