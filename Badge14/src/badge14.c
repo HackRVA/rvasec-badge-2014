@@ -60,14 +60,16 @@ struct BadgeState start_state;
 struct menu_entry *main_entries[3], games, schedule, settings, sketch, adventure;
 
 //extra element for back button
-struct menu_entry *game_entries[5], snake_e, bird_e, pong_e;
+struct menu_entry *game_entries[6], snake_e, bird_e, pong_e, more_games_e;
+struct menu_entry *more_game_entries[2], images_e;
+
 struct menu_entry *settings_entries[6], backlight, contrast, set_time, speaker,
                     more_settings_e;
-struct menu_entry *more_settings_entries[1], screen_saver_e;
-struct menu_entry back_to_main;
+struct menu_entry *more_settings_entries[2], screen_saver_e;
+struct menu_entry back_to_main, back_to_games, back_to_settings;
 
 struct menu_page *current_menu, main_page, games_page, settings_page, 
-                  schedule_page, more_settings_page;
+                  schedule_page, more_settings_page, more_games_page;
 
 //main menu texts
 const char game_txt[] = "DIVERSIONS",
@@ -79,7 +81,8 @@ const char snake_txt[] = "SNAKE",
            adventure_txt[] = "ADVENTURE",
            sketch_txt[] = "SKETCH",
            bird_txt[] = "BADGY BIRD",
-           pong_txt[] = "PONG";
+           pong_txt[] = "PONG",
+           images_txt[] = "IMAGES";
 
 //settings menu text
 const char set_backlight[] = "BACKLIGHT",
@@ -94,10 +97,13 @@ const char screen_saver_txt[] = "SCREEN SAVER" ,
 
 //main_page.entries;
 struct BadgeState snake_state, sketch_state, manual_contrast_state,
-                    bird_state, schedule_browse_state, set_time_state;
+                    bird_state, schedule_browse_state, set_time_state,
+                    image_viewer_state;
 
 void initGFX(void)
 {
+    unsigned char i = 0;
+    
     main_buff.pixels = pix2;
     main_buff.height = 48;
     main_buff.width = 84;
@@ -107,16 +113,26 @@ void initGFX(void)
     bird_idle_buff.width = 15;
 
     //the doge
-    screen_images[0].name = doge_txt;
-    screen_images[0].buff.pixels = doge;
-    screen_images[0].buff.height = 48;
-    screen_images[0].buff.width = 84;
+    screen_images[i].name = doge_txt;
+    screen_images[i].buff.pixels = doge;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+    
+    i++;
 
     //grumpy cat
-    screen_images[1].name = grump_txt;
-    screen_images[1].buff.pixels = grump;
-    screen_images[1].buff.height = 48;
-    screen_images[1].buff.width = 84;
+    screen_images[i].name = grump_txt;
+    screen_images[i].buff.pixels = grump;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+    i++;
+
+    //grumpy cat
+    screen_images[i].name = stache_txt;
+    screen_images[i].buff.pixels = stache;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
 }
 
 void setupMenus(void)
@@ -148,7 +164,7 @@ void setupMenus(void)
         
     //-----------------------
     // setup GAMES
-    games_page.num_entries = 5;
+    games_page.num_entries = 6;
     games_page.selected = 0;
     games_page.entries = game_entries;
 
@@ -172,7 +188,29 @@ void setupMenus(void)
         sketch.menu_entry = 0;
         sketch.state_entry = &sketch_state;
 
-    game_entries[4] = &back_to_main;
+    game_entries[4] = &more_games_e;
+        more_games_e.text = more_txt;
+        more_games_e.menu_entry = &more_games_page;
+        more_games_e.state_entry = 0;
+
+    game_entries[5] = &back_to_main;
+
+    //-----------------------
+    // setup MORE GAMES
+    more_games_page.num_entries = 2;
+    more_games_page.selected = 0;
+    more_games_page.entries = more_game_entries;
+
+    more_game_entries[0] = &images_e;
+        images_e.text = images_txt;
+        images_e.menu_entry = 0;
+        images_e.state_entry = &image_viewer_state;
+
+    more_game_entries[1] = &back_to_games;
+        back_to_games.text = go_back;
+        back_to_games.menu_entry = &games_page;
+        back_to_games.state_entry = 0;
+        
 
     //-----------------------
     // setup SCHEDULE
@@ -220,7 +258,7 @@ void setupMenus(void)
 
     //-----------------------
     // setup MORE SETTINGS
-    more_settings_page.num_entries = 1;
+    more_settings_page.num_entries = 2;
     more_settings_page.selected = 0;
     more_settings_page.entries = more_settings_entries;
 
@@ -228,6 +266,12 @@ void setupMenus(void)
         screen_saver_e.text = screen_saver_txt;
         screen_saver_e.menu_entry = 0;
         screen_saver_e.state_entry = 0;
+
+    more_settings_entries[1] = &back_to_settings;
+        back_to_settings.text = go_back;
+        back_to_settings.menu_entry = &settings_page;
+        back_to_settings.state_entry = 0;
+
 }
 
 void setupStates(void)
@@ -261,6 +305,10 @@ void setupStates(void)
     initBadgeState(&set_time_state);
         set_time_state.state_handler = adjust_time;
         set_time_state.next_state = &set_time_state;
+
+    initBadgeState(&image_viewer_state);
+        image_viewer_state.state_handler = image_viewer;
+        image_viewer_state.next_state = &image_viewer_state;
 }
 
 struct BadgeState* Init_Game(void)
@@ -2117,5 +2165,69 @@ void* adjust_time(struct BadgeState *b_state)
                          &main_buff);
         
         blitBuff_opt(&main_buff, 0, 0);
+    }
+}
+
+void* image_viewer(struct BadgeState *b_state)
+{
+    unsigned char redraw = 0;
+    b_state->slide_handler(&b_state->slide_states);
+
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+
+    if(!b_state->counter_1)
+    {
+        redraw = 1;
+        b_state->counter_1++;
+        b_state->next_state = b_state;
+    }
+
+    if(bt_swipe < 0 && b_state->counter_2 < NUM_IMAGE_ASSETS - 1)
+    {
+        b_state->counter_2++;
+        redraw = 1;
+    }
+
+    if(bt_swipe > 0 && b_state->counter_2 > 0)
+    {
+        b_state->counter_2--;
+        redraw = 1;
+    }
+    if ( button_pressed == 250)
+    {
+        button_pressed++;
+        fill_buff(&main_buff, 0x00);
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        b_state->counter_1 = 0;
+
+    }
+    if(redraw)
+    {
+        blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
+//        struct coord loc;
+//        loc.x = 0;
+//        loc.y = 0;
+//        char start_time[5], end_time[5];
+//        fill_buff(&main_buff, 0x00);
+//        intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
+//        intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
+//
+//        draw_square(&main_buff, loc, 83, 11);
+//
+//        buffString(1, 2,
+//                    start_time,
+//                    &main_buff);
+//
+//        buffString(48, 2,
+//                    end_time,
+//                    &main_buff);
+//
+//        buffString(0, 14,
+//            conf_events_d1[b_state->counter_2].title,
+//                    &main_buff);
+//
+//        blitBuff_opt(&main_buff, 0, 0);
     }
 }
