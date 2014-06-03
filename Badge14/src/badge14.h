@@ -195,7 +195,7 @@ void* badgy_bird(struct BadgeState *b_state);
 void* tunnelFlight(struct BadgeState *b_state);
 void* image_viewer(struct BadgeState *b_state);
 void* setup_screen_saver(struct BadgeState *b_state);
-
+void* gogo_screen_saver(struct BadgeState *b_state);
 
 void* debugStage(struct BadgeState *b_state);
 void printTouchVals(unsigned char btm, unsigned char side);

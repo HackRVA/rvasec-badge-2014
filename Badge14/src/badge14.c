@@ -66,7 +66,7 @@ struct menu_entry *more_game_entries[2], images_e;
 
 struct menu_entry *settings_entries[6], backlight, contrast, set_time, speaker,
                     more_settings_e;
-struct menu_entry *more_settings_entries[2], screen_saver_e;
+struct menu_entry *more_settings_entries[3], screen_saver_e, screen_saver_activate;
 struct menu_entry back_to_main, back_to_games, back_to_settings;
 
 struct menu_page *current_menu, main_page, games_page, settings_page, 
@@ -93,13 +93,15 @@ const char set_backlight[] = "BACKLIGHT",
 
 //
 const char screen_saver_txt[] = "SCREEN SAVER" ,
+           screen_saver_on_txt[] = "SCRN SAVER ON",
            go_back[] = "<-[BACK]",
            more_txt[] = "[MORE]";
 
 //main_page.entries;
 struct BadgeState snake_state, sketch_state, manual_contrast_state,
                     bird_state, schedule_browse_state, set_time_state,
-                    image_viewer_state, screen_saver_setup_state;
+                    image_viewer_state, screen_saver_setup_state,
+                    screen_saver_state;
 
 void initGFX(void)
 {
@@ -259,7 +261,7 @@ void setupMenus(void)
 
     //-----------------------
     // setup MORE SETTINGS
-    more_settings_page.num_entries = 2;
+    more_settings_page.num_entries = 3;
     more_settings_page.selected = 0;
     more_settings_page.entries = more_settings_entries;
 
@@ -268,7 +270,12 @@ void setupMenus(void)
         screen_saver_e.menu_entry = 0;
         screen_saver_e.state_entry = &screen_saver_setup_state;
 
-    more_settings_entries[1] = &back_to_settings;
+    more_settings_entries[1] = &screen_saver_activate;
+        screen_saver_activate.text = screen_saver_on_txt;
+        screen_saver_activate.menu_entry = 0;
+        screen_saver_activate.state_entry = &screen_saver_state;
+
+    more_settings_entries[2] = &back_to_settings;
         back_to_settings.text = go_back;
         back_to_settings.menu_entry = &settings_page;
         back_to_settings.state_entry = 0;
@@ -314,6 +321,10 @@ void setupStates(void)
     initBadgeState(&screen_saver_setup_state);
         screen_saver_setup_state.state_handler = setup_screen_saver;
         screen_saver_setup_state.next_state = &screen_saver_setup_state;
+
+    initBadgeState(&screen_saver_state);
+        screen_saver_state.state_handler = gogo_screen_saver;
+        screen_saver_state.next_state = &screen_saver_state;
 }
 
 struct BadgeState* Init_Game(void)
@@ -2330,5 +2341,63 @@ void* setup_screen_saver(struct BadgeState *b_state)
             b_state->big_counter_1 = 1;            
         }
         
+    }
+}
+
+#define SAVER_INTERVAL 500000
+void* gogo_screen_saver(struct BadgeState *b_state)
+{
+    unsigned char redraw = 0;
+    b_state->slide_handler(&b_state->slide_states);
+
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+
+    if(!b_state->counter_1)
+    {
+        redraw = 1;
+        b_state->counter_1++;
+        b_state->next_state = b_state;
+        b_state->big_counter = SAVER_INTERVAL;
+
+        //might as well save some power
+        set_leds(0x00);
+        if(num_saver_imgs == 0)
+        {
+            fill_buff(&main_buff, 0x00);
+            start_state.next_state = &start_state;
+            b_state->next_state = &start_state;
+            b_state->counter_1 = 0;
+        }
+    }
+
+    if(!b_state->big_counter--)
+    {
+        b_state->big_counter = SAVER_INTERVAL;
+        if(b_state->counter_2 < num_saver_imgs - 1)
+        {
+            b_state->counter_2++;
+            
+        }
+        else
+        {
+            b_state->counter_2 = 0;
+        }
+        redraw = 1;
+    }
+
+    if ( button_pressed == 250)
+    {
+        button_pressed++;
+        fill_buff(&main_buff, 0x00);
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        b_state->counter_1 = 0;
+
+    }
+    if(redraw)
+    {
+        //blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
+        blitBuff_opt(&(screen_saver_imgs[b_state->counter_2]->buff), 0, 0);
     }
 }
