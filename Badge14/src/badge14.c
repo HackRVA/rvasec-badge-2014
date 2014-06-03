@@ -1502,14 +1502,14 @@ void* snake(struct BadgeState *b_state)
     }
 }
 
-#define BIRD_RATE 4000
+#define BIRD_RATE 3000
 #define BIRD_ST_HIEGHT 20
 #define BIRD_X 20
 #define PIPE_RATE 50
-#define SHORTEST_PIPE_D 26
+#define SHORTEST_PIPE_D 30
 #define PIPE_X_B4_ADD 84 - SHORTEST_PIPE_D
 #define G_ACC 1
-#define PIPE_W 8    //width of the pipes
+#define PIPE_W 5    //width of the pipes
 #define PIPE_H 25   //height of openings
 #define MAX_PIPES 2
 struct coord pipe_locs[MAX_PIPES];
@@ -1594,7 +1594,7 @@ void* badgy_bird(struct BadgeState *b_state)
         {
             b_state->counter_2++;
             button_pressed++;
-            y_acc_mag = -7;
+            y_acc_mag = -8;
             y_acc_length = 7;
             b_state->counter_1 = 0;
         }
@@ -1605,7 +1605,7 @@ void* badgy_bird(struct BadgeState *b_state)
         if ( button_pressed == 250)// || b_state->slide_states.bottom_hold_count > 2)
         {
             button_pressed++;
-            y_acc_mag = -7;
+            y_acc_mag = -8;
             y_acc_length = 7;
             b_state->counter_1 = 0;
 
@@ -1615,7 +1615,6 @@ void* badgy_bird(struct BadgeState *b_state)
 
          if(b_state->big_counter++ > BIRD_RATE)
          {
-             
              //clean things up
              clear_screen_buff();
              fill_buff(&main_buff, 0x00);
@@ -1708,7 +1707,7 @@ void* badgy_bird(struct BadgeState *b_state)
                     fill_buff_area(pipe_locs[i], PIPE_W, 48 - pipe_locs[i].y - 1,
                                         0xff, &main_buff);
 
-                    pipe_locs[i].x--;
+                    pipe_locs[i].x -= 2;
                     if(pipe_locs[i].x < (BIRD_X - PIPE_W - 1) && (i != last_cleared))
                     {
                         last_cleared = i;
@@ -1763,8 +1762,8 @@ void* draw_main_ticker(struct BadgeState *b_state)
         loc.x = 0;
         loc.y = 36;
         char start_time[5], end_time[5];
-        intTime_to_charTime(start_time, conf_events[b_state->counter_2].start_time);
-        intTime_to_charTime(end_time, conf_events[b_state->counter_2].end_time);
+        intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
+        intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
 
         draw_square(&main_buff, loc, 83, 11);
 
@@ -1777,7 +1776,7 @@ void* draw_main_ticker(struct BadgeState *b_state)
                     &main_buff);
 
         buffString_trunc(0, 28,
-                        conf_events[b_state->counter_2].title,
+                        conf_events_d1[b_state->counter_2].title,
                         14,
                         11,
                         "...",
@@ -1881,8 +1880,8 @@ void* browse_schedule(struct BadgeState *b_state)
         loc.y = 0;
         char start_time[5], end_time[5];
         fill_buff(&main_buff, 0x00);
-        intTime_to_charTime(start_time, conf_events[b_state->counter_2].start_time);
-        intTime_to_charTime(end_time, conf_events[b_state->counter_2].end_time);
+        intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
+        intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
 
         draw_square(&main_buff, loc, 83, 11);
 
@@ -1895,7 +1894,7 @@ void* browse_schedule(struct BadgeState *b_state)
                     &main_buff);
 
         buffString(0, 14,
-            conf_events[b_state->counter_2].title,
+            conf_events_d1[b_state->counter_2].title,
                     &main_buff);
 
         blitBuff_opt(&main_buff, 0, 0);
