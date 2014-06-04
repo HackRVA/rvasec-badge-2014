@@ -67,10 +67,11 @@ struct menu_entry *more_game_entries[2], images_e;
 struct menu_entry *settings_entries[6], backlight, contrast, set_time, speaker,
                     more_settings_e;
 struct menu_entry *more_settings_entries[3], screen_saver_e, screen_saver_activate;
+struct menu_entry *day_pick_entries[3],  day1_e, day2_e;
 struct menu_entry back_to_main, back_to_games, back_to_settings;
 
 struct menu_page *current_menu, main_page, games_page, settings_page, 
-                  schedule_page, more_settings_page, more_games_page;
+                  schedule_page, more_settings_page, more_games_page, day_pick_page;
 
 //main menu texts
 const char game_txt[] = "DIVERSIONS",
@@ -94,6 +95,8 @@ const char set_backlight[] = "BACKLIGHT",
 //
 const char screen_saver_txt[] = "SCREEN SAVER" ,
            screen_saver_on_txt[] = "SCRN SAVER ON",
+           day1_txt[] = "DAY 1",
+           day2_txt[] = "DAY 2",
            go_back[] = "<-[BACK]",
            more_txt[] = "[MORE]";
 
@@ -157,8 +160,8 @@ void setupMenus(void)
 
     main_entries[1] = &schedule;
         schedule.text = schedule_txt;
-        schedule.menu_entry = 0;
-        schedule.state_entry = &schedule_browse_state;
+        schedule.menu_entry = &schedule_page;
+        schedule.state_entry = 0;
 
     main_entries[2] = &settings;
         settings.text = settings_txt;
@@ -217,11 +220,22 @@ void setupMenus(void)
 
     //-----------------------
     // setup SCHEDULE
-    schedule_page.num_entries = 0;
+    schedule_page.num_entries = 3;
     schedule_page.selected = 0;
-    schedule_page.entries = 0;
-    schedule_page.extra_func = draw_main_ticker;
+    schedule_page.entries = day_pick_entries;
+    schedule_page.extra_func = 0;// draw_main_ticker;
 
+    day_pick_entries[0] = &day1_e;
+        day1_e.text = day1_txt;
+        day1_e.menu_entry = 0;
+        day1_e.state_entry = &schedule_browse_state;
+
+    day_pick_entries[1] = &day2_e;
+        day2_e.text = day2_txt;
+        day2_e.menu_entry = 0;
+        day2_e.state_entry = &schedule_browse_state;
+
+    day_pick_entries[2] = &back_to_main;
 
     //-----------------------
     // setup SETTINGS
@@ -2016,19 +2030,32 @@ void printTouchVals(unsigned char btm, unsigned char side)
 void* browse_schedule(struct BadgeState *b_state)
 {
     unsigned char redraw = 0;
+    static struct Conference_Event* events = 0;
+    static unsigned char num_events = 0;
     b_state->slide_handler(&b_state->slide_states);
 
     char lr_swipe = b_state->slide_states.front.lr_swipe;
     char bt_swipe = b_state->slide_states.front.bt_swipe;
     if(!b_state->counter_1)
     {
+
+        if(schedule_page.selected == 0)
+        {
+            events = conf_events_d1;
+            num_events = NUM_EVENTS_D1;
+        }
+        else if (schedule_page.selected == 1)
+        {
+            events = conf_events_d2;
+            num_events = NUM_EVENTS_D2;
+        }
         redraw = 1;
         b_state->counter_1++;
         b_state->next_state = b_state;
         b_state->big_counter = 0;
     }
 
-    if(bt_swipe < 0 && b_state->counter_2 < NUM_EVENTS_D2 - 1)
+    if(bt_swipe < 0 && b_state->counter_2 < num_events - 1)
     {
         b_state->counter_2++;
         redraw = 1;
@@ -2068,8 +2095,8 @@ void* browse_schedule(struct BadgeState *b_state)
         loc.y = 9;
         char start_time[5], end_time[5];
         fill_buff(&main_buff, 0x00);
-        intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
-        intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
+        intTime_to_charTime(start_time, events[b_state->counter_2].start_time);
+        intTime_to_charTime(end_time, events[b_state->counter_2].end_time);
 
         draw_square(&main_buff, loc, 83, 9);
 
@@ -2088,7 +2115,7 @@ void* browse_schedule(struct BadgeState *b_state)
                         &main_buff);
 
             buffString(0, 20,
-                conf_events_d1[b_state->counter_2].ballroom_title,
+                events[b_state->counter_2].ballroom_title,
                         &main_buff);
         }
 
@@ -2099,7 +2126,7 @@ void* browse_schedule(struct BadgeState *b_state)
                         &main_buff);
 
             buffString(0, 20,
-                conf_events_d1[b_state->counter_2].salon_title,
+                events[b_state->counter_2].salon_title,
                         &main_buff);
         }
 
@@ -2110,7 +2137,7 @@ void* browse_schedule(struct BadgeState *b_state)
                 &main_buff);
 
             buffString(0, 20,
-                conf_events_d1[b_state->counter_2].other_title,
+                events[b_state->counter_2].other_title,
                         &main_buff);
         }
         
