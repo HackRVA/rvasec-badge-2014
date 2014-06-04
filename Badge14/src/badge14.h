@@ -106,7 +106,7 @@ struct BadgeState
 
     //create a linked list type structure, should allow use to build some
     //complex sequences with limited global var use
-    struct BadgeState *next_state;
+    struct BadgeState *next_state, *back_state;
 
     //what function should be handed this state
     void* (*state_handler)(struct BadgeState* b_state);

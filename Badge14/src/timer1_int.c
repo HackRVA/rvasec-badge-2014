@@ -163,7 +163,6 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) Timer2Handler(void)
 	   G_IRrecv = 2;
 	   G_bitCnt = 0;
 	   G_halfCount = 0;
-
 	}
 	else {
 	   G_halfCount++;
@@ -185,7 +184,6 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) Timer2Handler(void)
                    return;
                }
            }
-
 	}
 	return;
    }

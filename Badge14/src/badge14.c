@@ -41,12 +41,16 @@ unsigned char popQueue(struct Queue *queue)
     unsigned char ret = queue->vals[0];
 
     unsigned char i = 0;
+
+    //from front to second to last
     for(i = 0; i < QUEUE_SIZE - 1; i++)
     {
+        //shift up to front
         queue->vals[i] = queue->vals[i+1];
     }
 
-    queue->vals[i] = 0;
+    //
+    queue->vals[QUEUE_SIZE - 1] = 0;
 
     // don't underflow
     if(queue->q_size)
@@ -61,7 +65,8 @@ unsigned char pushQueue(struct Queue *queue, unsigned char item)
     if(queue->q_size < QUEUE_SIZE)
     {
         //assign value and increment size
-        queue->vals[queue->q_size++] = item;
+        queue->vals[queue->q_size] = item;
+        queue->q_size++;
         return 0;
     }
     else
@@ -473,7 +478,7 @@ void Run_Game(struct BadgeState **state)
     }
 
     //state wants to send something?
-    if((*state)->ir_outgoing.q_size)
+    if((*state)->ir_outgoing.q_size && !G_IRsend)// && !G_IRsendVal)
     {
         G_IRsendVal = popQueue(&(*state)->ir_outgoing);
         G_IRsend = 1;
@@ -490,12 +495,16 @@ void* defaultIR(struct BadgeState *b_state)
     unsigned int temp_in = 0;
 //    unsigned char tmp_chars[] = "b";
 //    tmp_chars[0] = chksum;
-    char tmp_chars[QUEUE_SIZE + 1] = {0};
+    unsigned char tmp_chars[QUEUE_SIZE + 1] = {0};
     //tmp_chars[QUEUE_SIZE];// = 0;
-    
+    tmp_chars[0] = b_state->ir_incoming.vals[0] & 0x7F;
+    tmp_chars[1] = b_state->ir_incoming.vals[1] & 0x7F;
+    tmp_chars[2] = b_state->ir_incoming.vals[2] & 0x7F;
+    tmp_chars[3] = b_state->ir_incoming.vals[3] & 0x7F;
     for(i = 0; i < QUEUE_SIZE; i++)
     {
-        tmp_chars[i] = (popQueue(&b_state->ir_incoming) & 0x7F);
+        //tmp_chars[i] =
+                (popQueue(&b_state->ir_incoming) & 0x7F);
         chksum ^= tmp_chars[i];
         temp_in |=  ((unsigned int) tmp_chars[i]) << (24 - (8 * i));
     }
@@ -508,6 +517,8 @@ void* defaultIR(struct BadgeState *b_state)
                 "GOT SOMETHING:",
                 &main_buff);
 
+
+    
     buffString(10, 10,
                 tmp_chars,
                 &main_buff);
@@ -520,6 +531,7 @@ void* defaultIR(struct BadgeState *b_state)
 void* user_ping(struct BadgeState *b_state)
 {
     unsigned char redraw = 0;
+    unsigned char test[] ="abcd";
     b_state->slide_handler(&b_state->slide_states);
 
     char lr_swipe = b_state->slide_states.front.lr_swipe;
@@ -547,12 +559,18 @@ void* user_ping(struct BadgeState *b_state)
     {
         button_pressed++;
         
-        G_IRsendVal = 128 | 0x61;
-        G_IRsend = 1;
-//        pushQueue(&b_state->ir_outgoing, 'a');
-//        pushQueue(&b_state->ir_outgoing, 'b');
-//        pushQueue(&b_state->ir_outgoing, 'c');
-//        pushQueue(&b_state->ir_outgoing, 'd');
+//        G_IRsendVal = 128 | 0x61;
+//        G_IRsend = 1;
+
+//        pushQueue(&b_state->ir_outgoing, test[0] | 128);
+//        pushQueue(&b_state->ir_outgoing, test[1] | 128);
+//        pushQueue(&b_state->ir_outgoing, test[2] | 128);
+//        pushQueue(&b_state->ir_outgoing, test[3] | 128);
+        b_state->ir_outgoing.vals[0] = test[0] | 128;
+        b_state->ir_outgoing.vals[1] = test[1] | 128;
+        b_state->ir_outgoing.vals[2] = test[2] | 128;
+        b_state->ir_outgoing.vals[3] = test[3] | 128;
+        b_state->ir_outgoing.q_size = 4;
         redraw = 1;
 //        start_state.next_state = &start_state;
 //        b_state->next_state = &start_state;
@@ -567,6 +585,10 @@ void* user_ping(struct BadgeState *b_state)
         buffString(24, 0,
                     "SENT",
                     &main_buff);
+
+        buffString(24, 10,
+             test,
+            &main_buff);
 
         blitBuff_opt(&main_buff, 0, 0);
         //blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
@@ -2659,3 +2681,13 @@ void* gogo_screen_saver(struct BadgeState *b_state)
     }
 }
 
+void* sendMsg(struct BadgeState *b_state)
+{
+    //init
+    if(!b_state->counter_1)
+    {
+        b_state->counter_1 = 1;
+        b_state->counter_2 = 0;
+    }
+    
+}
