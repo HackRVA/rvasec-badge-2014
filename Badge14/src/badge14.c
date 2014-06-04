@@ -4,6 +4,7 @@
 //const char hextab[]={"0123456789ABCDEF"};
 extern char *hextab;
 extern char gContrast;
+extern unsigned int backlight_cnt, backlight_rate;
 unsigned char pix[504] = {0};
 //dont need both in prod, debugging now
 unsigned char pix2[504] = {0};
@@ -169,7 +170,7 @@ const char screen_saver_txt[] = "SCREEN SAVER" ,
 struct BadgeState snake_state, sketch_state, manual_contrast_state,
                     bird_state, schedule_browse_state, set_time_state,
                     image_viewer_state, screen_saver_setup_state,
-                    screen_saver_state, ping_state;
+                    screen_saver_state, ping_state, set_backlight_state;
 
 void initGFX(void)
 {
@@ -208,7 +209,6 @@ void initGFX(void)
 
 void setupMenus(void)
 {
-
     current_menu = &main_page;
 
     //-----------------------
@@ -268,7 +268,7 @@ void setupMenus(void)
 
     //-----------------------
     // setup MORE GAMES
-    more_games_page.num_entries = 2;
+    more_games_page.num_entries = 3;
     more_games_page.selected = 0;
     more_games_page.entries = more_game_entries;
 
@@ -316,7 +316,7 @@ void setupMenus(void)
     settings_entries[0] = &backlight;
         backlight.text = set_backlight;
         backlight.menu_entry = 0;
-        backlight.state_entry = 0;
+        backlight.state_entry = &set_backlight_state;
 
     settings_entries[1] = &contrast;
         contrast.text = adjust_contrast;
@@ -370,7 +370,7 @@ void setupStates(void)
 {
     initBadgeState(&start_state);
         start_state.next_state = &start_state;
-        start_state.state_handler = auto_contrast; //touchCalibrate;//main_menu;//tunnelFlight; // //
+        start_state.state_handler = menu_maker;//touchCalibrate;//main_menu;//tunnelFlight; //auto_contrast; // //
         start_state.slide_handler = autoSlide;
         
     initBadgeState(&sketch_state);
@@ -413,6 +413,10 @@ void setupStates(void)
     initBadgeState(&ping_state);
         ping_state.state_handler = user_ping;
         ping_state.next_state = &ping_state;
+
+    initBadgeState(&set_backlight_state);
+        set_backlight_state.state_handler = adjust_backlight;
+        set_backlight_state.next_state = &set_backlight_state;
 }
 
 extern unsigned char G_IRrecvVal;
@@ -436,7 +440,7 @@ struct BadgeState* Init_Game(void)
 
     start_state.tm.l=0;
     start_state.tm.sec=0x00;
-    start_state.tm.min=0x00;
+    start_state.tm.min=0x20;
     start_state.tm.hour=0x08;
 
     start_state.dt.wday=4;
@@ -1133,7 +1137,6 @@ unsigned char calibrateSide2(struct BadgeState *b_state)
     return 0;
 }
 
-
 void* touchCalibrate(struct BadgeState *b_state)
 {  
     if(!b_state->big_counter)
@@ -1219,19 +1222,19 @@ void* touchCalibrate(struct BadgeState *b_state)
         {
             button_pressed++;
             b_state->big_counter = 4;
-            b_state->big_counter
-                = b_state->counter_1
-                = b_state->counter_2
-                = b_state->big_counter_1 = 0;
-            current_menu = &main_page;
-            b_state->state_handler = menu_maker;//main_menu;//welcome;
+
         }
     }
     else
     {
 //        LCDClear();
 //        LCDLogo();
-
+            b_state->big_counter
+                = b_state->counter_1
+                = b_state->counter_2
+                = b_state->big_counter_1 = 0;
+            current_menu = &main_page;
+            b_state->state_handler = menu_maker;//main_menu;//welcome;
 
     }
 }
@@ -1500,6 +1503,7 @@ void* menu_maker(struct BadgeState *b_state)
         LCDClear();
         fill_buff(&main_buff, 0x00);
         redraw = 1;
+        b_state->counter_1 = 0;
         button_pressed++;
 
         if( current_menu->entries[current_menu->selected]->menu_entry )
@@ -1512,6 +1516,7 @@ void* menu_maker(struct BadgeState *b_state)
         {
             b_state->next_state
                     = current_menu->entries[current_menu->selected]->state_entry;
+            
             return;
         }
     }
@@ -1641,11 +1646,11 @@ void* auto_contrast(struct BadgeState *b_state)
         LCDClear();
         fill_buff(&main_buff, 0x00);
 
-        current_menu = &settings_page;
-        start_state.next_state = &start_state;
-        b_state->next_state = &start_state;
+        //current_menu = &main_page;
+//        start_state.next_state = &start_state;
+//        b_state->next_state = &start_state;
         b_state->state_handler = welcome;
-        zeroStateCounters(b_state);
+        //zeroStateCounters(b_state);
         button_pressed++;
         return;
 
@@ -1654,44 +1659,47 @@ void* auto_contrast(struct BadgeState *b_state)
 
 void* manual_contrast(struct BadgeState *b_state)
 {
-    static struct pix_buff buff;
+    static unsigned char leds = 0xff, x = 40, y  = 35;
+    unsigned char redraw = 0;
 
-    static unsigned char leds = 0xff, x = 40, y  = 35, redraw = 0;
-
-    //if(!b_state->counter_2++)
+    if(!b_state->counter_1)
     {
-        b_state->slide_handler(&b_state->slide_states);
-
-        //set_leds(b_state->slide_states.front.lower_loc);
-        char lr_swipe = b_state->slide_states.front.lr_swipe;
-        char bt_swipe = b_state->slide_states.front.bt_swipe;
-        //set_leds(leds += bt_swipe);
-
-        if(lr_swipe < 0 && x > 10)
-                //&& (current_menu->selected < (current_menu->num_entries - 1)))
-        {
-            //current_menu->selected += 1;
-            x--;
-            gContrast--;
-            LCDInit();
-            redraw = 1;
-        }
-
-        if(lr_swipe > 0 && x < 70)//&& (current_menu->selected > 0))
-        {
-            //current_menu->selected -= 1;
-            x++;
-            gContrast++;
-            LCDInit();
-            redraw = 1;
-        }
+       b_state->counter_1 = 1;
+       redraw = 1;
     }
+    
+    b_state->slide_handler(&b_state->slide_states);
+
+    //set_leds(b_state->slide_states.front.lower_loc);
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+    //set_leds(leds += bt_swipe);
+
+    if(lr_swipe < 0 && x > 10)
+            //&& (current_menu->selected < (current_menu->num_entries - 1)))
+    {
+        //current_menu->selected += 1;
+        x--;
+        gContrast--;
+        LCDInit();
+        redraw = 1;
+    }
+
+    if(lr_swipe > 0 && x < 70)//&& (current_menu->selected > 0))
+    {
+        //current_menu->selected -= 1;
+        x++;
+        gContrast++;
+        LCDInit();
+        redraw = 1;
+    }
+
     if ( button_pressed == 250 )
     {
        // if(current_menu->selected == 2)
         {
             LCDClear();
-            fill_buff(&buff, 0x00);
+            fill_buff(&main_buff, 0x00);
 
             current_menu = &settings_page;
             start_state.next_state = &start_state;
@@ -1711,22 +1719,22 @@ void* manual_contrast(struct BadgeState *b_state)
         //fill_buff(&buff, 0x00);
         b_state->counter_1 = 1;
         redraw = 0;
-        buff.height = 48;
-        buff.width = 84;
+        main_buff.height = 48;
+        main_buff.width = 84;
         char msg[] = "Press BTN\nwhen finished";
-        buff.pixels = pix;
-        fill_buff(&buff, 0x00);
+        main_buff.pixels = pix;
+        fill_buff(&main_buff, 0x00);
         buffString(0, 0,
                     msg,
-                    &buff);
-        draw_square(&buff, loc, 83, 7);
+                    &main_buff);
+        draw_square(&main_buff, loc, 83, 7);
         invertBuffArea(x,
                        y,
                        7,
                        3,
-                       &buff);
+                       &main_buff);
 
-        blitBuff_opt(&buff, 0, 0);
+        blitBuff_opt(&main_buff, 0, 0);
     }
 }
 
@@ -1852,7 +1860,7 @@ void* snake(struct BadgeState *b_state)
         b_state->counter_2 = 0;
         b_state->counter_1 = 0;
         b_state->big_counter = 0;
-        return;
+        //return;
     }
 
     if(bt_swipe < 0 && !snake_ll[0].direction.yV)
@@ -1979,7 +1987,7 @@ void* snake(struct BadgeState *b_state)
 
         //check for boundry bust
         if(snake_ll[0].location.x >= 83 || snake_ll[0].location.y >=46
-           || snake_ll[0].location.x < 1  || snake_ll[0].location.y < 1 )
+           || snake_ll[0].location.x < 1  || snake_ll[0].location.y < 1)
         {
             start_state.next_state = &start_state;
             b_state->next_state = &start_state;
@@ -2858,4 +2866,179 @@ void* sendMsg(struct BadgeState *b_state)
         b_state->counter_2 = 0;
     }
     
+}
+
+void* adjust_backlight_slider(struct BadgeState *b_state)
+{
+    static unsigned char leds = 0xff, x = 40, y  = 35, redraw = 0;
+
+    b_state->slide_handler(&b_state->slide_states);
+
+    //set_leds(b_state->slide_states.front.lower_loc);
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+    //set_leds(leds += bt_swipe);
+
+    if(lr_swipe < 0 && x > 10)
+            //&& (current_menu->selected < (current_menu->num_entries - 1)))
+    {
+        //current_menu->selected += 1;
+        x--;
+        //backlight_rate-= 100;
+        backlight_rate >>= 1;
+        //LCDInit();
+        redraw = 1;
+    }
+
+    if(lr_swipe > 0 && x < 70)//&& (current_menu->selected > 0))
+    {
+        //current_menu->selected -= 1;
+        x++;
+        //backlight_rate+= 100;
+        if(!backlight_rate)
+            backlight_rate = 2;
+        else
+            backlight_rate <<= 1;
+        //LCDInit();
+        redraw = 1;
+    }
+
+    if ( button_pressed == 250 )
+    {
+        LCDClear();
+        fill_buff(&main_buff, 0x00);
+
+        current_menu = &settings_page;
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        redraw = 1;
+        button_pressed++;
+        return;
+
+    }
+
+    if(b_state->counter_1 == 0 || redraw)
+    {
+        struct coord loc;
+                loc.x = 0;
+                loc.y = y - 1;
+        LCDClear();
+        //fill_buff(&buff, 0x00);
+        b_state->counter_1 = 1;
+        redraw = 0;
+        main_buff.height = 48;
+        main_buff.width = 84;
+        char msg[] = "Press BTN\nwhen finished";
+        main_buff.pixels = pix;
+        fill_buff(&main_buff, 0x00);
+        buffString(0, 0,
+                    msg,
+                    &main_buff);
+        draw_square(&main_buff, loc, 83, 7);
+
+        invertBuffArea(x,
+                       y,
+                       7,
+                       3,
+                       &main_buff);
+
+        blitBuff_opt(&main_buff, 0, 0);
+    }
+}
+
+void* adjust_backlight(struct BadgeState *b_state)
+{
+    static unsigned char x = 33, y  = 35;
+    unsigned char redraw = 0;
+
+    b_state->slide_handler(&b_state->slide_states);
+
+    //set_leds(b_state->slide_states.front.lower_loc);
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+
+    if(!b_state->counter_2)
+    {
+        b_state->counter_2 = 1;
+        redraw =  1;
+    }
+
+    if(lr_swipe < 0)// && x > 10)
+    {
+        //current_menu->selected += 1;
+        x = 6;
+
+        LATBbits.LATB7 = 0;
+
+        redraw = 1;
+    }
+
+    if(lr_swipe > 0)//&& x < 70)//&& (current_menu->selected > 0))
+    {
+        //current_menu->selected -= 1;
+        x = 59;
+        LATBbits.LATB7 = 1;
+        redraw = 1;
+    }
+
+    if ( button_pressed == 250 )
+    {
+        LCDClear();
+        fill_buff(&main_buff, 0x00);
+
+        b_state->counter_2 = 0;
+        //current_menu = &settings_page;
+        
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        
+        redraw = 1;
+        button_pressed++;
+        return;
+
+    }
+
+    if(redraw)
+    {
+        struct coord loc;
+                loc.x = 5;
+                loc.y = 39;
+        LCDClear();
+
+        
+        redraw = 0;
+
+        fill_buff(&main_buff, 0x00);
+        
+        buffString(0, 10,
+                    "Press BTN\nwhen finished",
+                    &main_buff);
+
+        //OFF stuff
+        buffString(6, 41,
+                    "OFF",
+                    &main_buff);
+
+        draw_square(&main_buff, loc, 19, 8);
+
+
+
+        //ON stuff
+        buffString(60, 40,
+                    "ON",
+                    &main_buff);
+
+        loc.x = 58;
+        draw_square(&main_buff, loc, 19, 8);
+
+        invertBuffArea(x,
+                       40,
+                       18,
+                       6,
+                       &main_buff);
+
+        blitBuff_opt(&main_buff, 0, 0);
+
+        redraw = 0;
+    }
 }

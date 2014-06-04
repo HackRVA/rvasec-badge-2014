@@ -19,6 +19,15 @@
 #include "nokia.h"
 #include "badge_common.h"
 
+//char gContrast=0xB0;
+char gContrast=185;
+//int gDelay=100;
+int gDelay=20;
+
+
+#define DELAY { int i; for (i=0; i<gDelay; i++) ; }
+
+
 struct Font {
     
 };
@@ -687,11 +696,6 @@ void LCDClear(void) {
   gotoXY(0, 0); //After we clear the display, return to the home position
 }
 
-//char gContrast=0xB0;
-char gContrast=185;
-//int gDelay=100;
-int gDelay=20;
-#define DELAY { int i; for (i=0; i<gDelay; i++) ; }
 
 void LCDReset(void) {
   PIN_SCE = 0;

@@ -15,6 +15,9 @@
 #define PONG 0x0e
 #define MSG 0x0d
 
+#define SLOWEST_RATE 5000
+static unsigned int backlight_cnt = 2, backlight_rate = 2;
+
 //size of buffers hold possible cap touch vals
 #define SIZE 7
 #define MAX_SIZE 7
@@ -110,7 +113,7 @@ struct BadgeState
 
     //create a linked list type structure, should allow use to build some
     //complex sequences with limited global var use
-    struct BadgeState *next_state, *back_state;
+    struct BadgeState *next_state;//, *back_state;
 
     //what function should be handed this state
     void* (*state_handler)(struct BadgeState* b_state);
@@ -204,6 +207,7 @@ void* manual_contrast(struct BadgeState *b_state);
 void zeroStateCounters(struct BadgeState* b_state);
 void* auto_contrast(struct BadgeState *b_state);
 void* adjust_time(struct BadgeState *b_state);
+void* adjust_backlight(struct BadgeState *b_state);
 
 void* sliderPlay(struct BadgeState *b_state);
 void* snake(struct BadgeState *b_state);
