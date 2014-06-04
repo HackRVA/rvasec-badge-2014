@@ -434,8 +434,9 @@ struct BadgeState* Init_Game(void)
     setupRTCC();
     RtccSetTimeDate(start_state.tm.l, start_state.dt.l);
     TimerInit();
-    return (struct BadgeState *)&start_state;
+    //return (struct BadgeState *)&start_state;
     //return &bird_state;
+    return &ping_state;
 }
 
 //update clock every T_UPDATE_DELTA iterations
@@ -458,18 +459,17 @@ void Run_Game(struct BadgeState **state)
     //something recieved? Give it to the current state
     if(G_IRrecvVal)
     {
-        pushQueue(&(*state)->ir_incoming, G_IRrecvVal);
-        G_IRrecvVal = 0;
-        
-        //all messages in? Call the handler
-        if((*state)->ir_incoming.q_size == QUEUE_SIZE)
+//        pushQueue(&(*state)->ir_incoming, G_IRrecvVal);
+//
+//
+//        //all messages in? Call the handler
+//        if((*state)->ir_incoming.q_size == QUEUE_SIZE)
             (*state)->ir_handler(*state);
-
-        
+        G_IRrecvVal = 0;
     }
 
     //state wants to send something?
-    if((*state)->ir_incoming.q_size)
+    if((*state)->ir_outgoing.q_size)
     {
         G_IRsendVal = popQueue(&(*state)->ir_outgoing);
         G_IRsend = 1;
@@ -481,14 +481,88 @@ void Run_Game(struct BadgeState **state)
 
 void* defaultIR(struct BadgeState *b_state)
 {
-    b_state->ir_recvd_msg = b_state->ir_incoming.vals[0];
-    buffString(14, 0,
-        "GOT SOMETHING",
-        &main_buff);
+    
+    unsigned char i = 0, chksum = G_IRrecvVal;//b_state->ir_incoming.vals[0];
+    unsigned int temp_in = 0;
+    unsigned char tmp_chars[] = "b";
+    tmp_chars[0] = chksum;
+    //char tmp_chars[QUEUE_SIZE + 1] = {0};
+    //tmp_chars[QUEUE_SIZE];// = 0;
+    fill_buff(&main_buff, 0x00);
+//    for(i = 0; i < QUEUE_SIZE; i++)
+//    {
+//        tmp_chars[i] = popQueue(&b_state->ir_incoming);
+//        //chksum ^= tmp_chars[i];
+//        temp_in |=  ((unsigned int) tmp_chars[i]) << (24 - (8 * i));
+//    }
+
+    //b_state->ir_recvd_msg = b_state->ir_incoming.vals[0];
+    buffString(0, 0,
+                "GOT SOMETHING:",
+                &main_buff);
+
+    buffString(10, 10,
+                tmp_chars,
+                &main_buff);
+
+    set_leds( chksum );
 
     blitBuff_opt(&main_buff, 0, 0);
 }
 
+void* user_ping(struct BadgeState *b_state)
+{
+    unsigned char redraw = 0;
+    b_state->slide_handler(&b_state->slide_states);
+
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+
+    if(!b_state->counter_1)
+    {
+        //redraw = 1;
+        b_state->counter_1++;
+        b_state->next_state = b_state;
+    }
+
+    if(bt_swipe < 0)// && b_state->counter_2 < NUM_IMAGE_ASSETS - 1)
+    {
+       // b_state->counter_2++;
+       // redraw = 1;
+    }
+
+    if(bt_swipe > 0)// && b_state->counter_2 > 0)
+    {
+        //b_state->counter_2--;
+        //redraw = 1;
+    }
+    if ( button_pressed == 250)
+    {
+        button_pressed++;
+        fill_buff(&main_buff, 0x00);
+        G_IRsendVal = 128 | 0x61;
+        G_IRsend = 1;
+//        pushQueue(&b_state->ir_outgoing, 'a');
+//        pushQueue(&b_state->ir_outgoing, 'b');
+//        pushQueue(&b_state->ir_outgoing, 'c');
+//        pushQueue(&b_state->ir_outgoing, 'd');
+        redraw = 1;
+//        start_state.next_state = &start_state;
+//        b_state->next_state = &start_state;
+//        b_state->counter_1 = 0;
+    }
+
+    if(redraw)
+    {
+        //pushQueue(&b_state->ir_outgoing, bt_swipe);
+        buffString(24, 0,
+                    "SENT",
+                    &main_buff);
+
+        blitBuff_opt(&main_buff, 0, 0);
+        //blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
+    }
+}
 //////////////////////////////
 //PERIPH HANDLERS
 //////////////////////////////
@@ -2575,43 +2649,3 @@ void* gogo_screen_saver(struct BadgeState *b_state)
     }
 }
 
-void* user_ping(struct BadgeState *b_state)
-{
-    unsigned char redraw = 0;
-    b_state->slide_handler(&b_state->slide_states);
-
-    char lr_swipe = b_state->slide_states.front.lr_swipe;
-    char bt_swipe = b_state->slide_states.front.bt_swipe;
-
-    if(!b_state->counter_1)
-    {
-        redraw = 1;
-        b_state->counter_1++;
-        b_state->next_state = b_state;
-    }
-
-    if(bt_swipe < 0)// && b_state->counter_2 < NUM_IMAGE_ASSETS - 1)
-    {
-       // b_state->counter_2++;
-       // redraw = 1;
-    }
-
-    if(bt_swipe > 0)// && b_state->counter_2 > 0)
-    {
-        //b_state->counter_2--;
-        redraw = 1;
-    }
-    if ( button_pressed == 250)
-    {
-        button_pressed++;
-        fill_buff(&main_buff, 0x00);
-        start_state.next_state = &start_state;
-        b_state->next_state = &start_state;
-        b_state->counter_1 = 0;
-    }
-
-    if(redraw)
-    {
-        blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
-    }
-}

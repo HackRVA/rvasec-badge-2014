@@ -449,3 +449,9 @@ void bcdIncrement(unsigned char *num)
         *num = (((*num >> 4) + 1) & 0xf) << 4;
     }
 }
+
+void uINT_to_chars(unsigned int in, char *out)
+{
+    
+}
+
