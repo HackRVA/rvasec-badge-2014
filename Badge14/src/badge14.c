@@ -26,6 +26,49 @@ void initTouchState(struct TouchState *t_state)
     t_state->side_slider_right = 0;
 }
 
+void initQueue(struct Queue *queue)
+{
+    unsigned char i = 0;
+    for(i = 0; i < QUEUE_SIZE ; i++)
+    {
+        queue->vals[i] = 0;
+    }
+    queue->q_size = 0;
+}
+
+unsigned char popQueue(struct Queue *queue)
+{
+    unsigned char ret = queue->vals[0];
+
+    unsigned char i = 0;
+    for(i = 0; i < QUEUE_SIZE - 1; i++)
+    {
+        queue->vals[i] = queue->vals[i+1];
+    }
+
+    queue->vals[i] = 0;
+
+    // don't underflow
+    if(queue->q_size)
+        queue->q_size--;
+
+    return ret;
+}
+
+unsigned char pushQueue(struct Queue *queue, unsigned char item)
+{
+    //is there room?
+    if(queue->q_size < QUEUE_SIZE)
+    {
+        //assign value and increment size
+        queue->vals[queue->q_size++] = item;
+        return 0;
+    }
+    else
+        //unable to insert, return error
+        return 1;
+}
+
 void shiftTouchQueue(struct TouchQueue *queue)
 {
     queue->back = queue->mid_b;
@@ -41,6 +84,7 @@ void initBadgeState(struct BadgeState *b_state)
     b_state->next_state = 0;
     b_state->state_handler = 0;
     b_state->slide_handler = autoSlide;
+    b_state->ir_handler = defaultIR;
 
     //set touch to zero
     initTouchState(&b_state->slide_states.front);
@@ -53,7 +97,15 @@ void initBadgeState(struct BadgeState *b_state)
     b_state->counter_2 = 0;
     b_state->big_counter = 0;
     b_state->big_counter_1 = 0;
+
+    b_state->ir_recvd_msg = 0;
+
+    initQueue(&b_state->ir_incoming);
+    initQueue(&b_state->ir_outgoing);
 }
+
+
+
 
 //initialize all the things
 struct BadgeState start_state;
@@ -62,7 +114,7 @@ struct menu_entry *main_entries[3], games, schedule, settings, sketch, adventure
 
 //extra element for back button
 struct menu_entry *game_entries[6], snake_e, bird_e, pong_e, more_games_e;
-struct menu_entry *more_game_entries[2], images_e;
+struct menu_entry *more_game_entries[3], images_e, ping_e;
 
 struct menu_entry *settings_entries[6], backlight, contrast, set_time, speaker,
                     more_settings_e;
@@ -95,6 +147,7 @@ const char set_backlight[] = "BACKLIGHT",
 //
 const char screen_saver_txt[] = "SCREEN SAVER" ,
            screen_saver_on_txt[] = "SCRN SAVER ON",
+           ping_txt[] = "PING",
            day1_txt[] = "DAY 1",
            day2_txt[] = "DAY 2",
            go_back[] = "<-[BACK]",
@@ -104,7 +157,7 @@ const char screen_saver_txt[] = "SCREEN SAVER" ,
 struct BadgeState snake_state, sketch_state, manual_contrast_state,
                     bird_state, schedule_browse_state, set_time_state,
                     image_viewer_state, screen_saver_setup_state,
-                    screen_saver_state;
+                    screen_saver_state, ping_state;
 
 void initGFX(void)
 {
@@ -212,7 +265,12 @@ void setupMenus(void)
         images_e.menu_entry = 0;
         images_e.state_entry = &image_viewer_state;
 
-    more_game_entries[1] = &back_to_games;
+    more_game_entries[1] = &ping_e;
+        ping_e.text = ping_txt;
+        ping_e.menu_entry = 0;
+        ping_e.state_entry = &ping_state;
+        
+    more_game_entries[2] = &back_to_games;
         back_to_games.text = go_back;
         back_to_games.menu_entry = &games_page;
         back_to_games.state_entry = 0;
@@ -339,7 +397,12 @@ void setupStates(void)
     initBadgeState(&screen_saver_state);
         screen_saver_state.state_handler = gogo_screen_saver;
         screen_saver_state.next_state = &screen_saver_state;
+
+    initBadgeState(&ping_state);
+        ping_state.state_handler = user_ping;
+        ping_state.next_state = &ping_state;
 }
+
 
 struct BadgeState* Init_Game(void)
 {
@@ -370,12 +433,16 @@ struct BadgeState* Init_Game(void)
 
     setupRTCC();
     RtccSetTimeDate(start_state.tm.l, start_state.dt.l);
+    TimerInit();
     return (struct BadgeState *)&start_state;
     //return &bird_state;
 }
 
 //update clock every T_UPDATE_DELTA iterations
 #define T_UPDATE_DELTA 20000
+extern unsigned char G_IRrecvVal;
+extern unsigned char G_IRsendVal;
+extern unsigned char G_IRsend;
 void Run_Game(struct BadgeState **state)
 {
     static unsigned int cnt = 0;
@@ -388,8 +455,38 @@ void Run_Game(struct BadgeState **state)
         (*state)->tm.l = get_time();
     }
 
+    //something recieved? Give it to the current state
+    if(G_IRrecvVal)
+    {
+        pushQueue(&(*state)->ir_incoming, G_IRrecvVal);
+        G_IRrecvVal = 0;
+        
+        //all messages in? Call the handler
+        if((*state)->ir_incoming.q_size == QUEUE_SIZE)
+            (*state)->ir_handler(*state);
+
+        
+    }
+
+    //state wants to send something?
+    if((*state)->ir_incoming.q_size)
+    {
+        G_IRsendVal = popQueue(&(*state)->ir_outgoing);
+        G_IRsend = 1;
+    }
+
     //run the state
     (*state)->state_handler(*state);
+}
+
+void* defaultIR(struct BadgeState *b_state)
+{
+    b_state->ir_recvd_msg = b_state->ir_incoming.vals[0];
+    buffString(14, 0,
+        "GOT SOMETHING",
+        &main_buff);
+
+    blitBuff_opt(&main_buff, 0, 0);
 }
 
 //////////////////////////////
@@ -2475,5 +2572,46 @@ void* gogo_screen_saver(struct BadgeState *b_state)
     {
         //blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
         blitBuff_opt(&(screen_saver_imgs[b_state->counter_2]->buff), 0, 0);
+    }
+}
+
+void* user_ping(struct BadgeState *b_state)
+{
+    unsigned char redraw = 0;
+    b_state->slide_handler(&b_state->slide_states);
+
+    char lr_swipe = b_state->slide_states.front.lr_swipe;
+    char bt_swipe = b_state->slide_states.front.bt_swipe;
+
+    if(!b_state->counter_1)
+    {
+        redraw = 1;
+        b_state->counter_1++;
+        b_state->next_state = b_state;
+    }
+
+    if(bt_swipe < 0)// && b_state->counter_2 < NUM_IMAGE_ASSETS - 1)
+    {
+       // b_state->counter_2++;
+       // redraw = 1;
+    }
+
+    if(bt_swipe > 0)// && b_state->counter_2 > 0)
+    {
+        //b_state->counter_2--;
+        redraw = 1;
+    }
+    if ( button_pressed == 250)
+    {
+        button_pressed++;
+        fill_buff(&main_buff, 0x00);
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        b_state->counter_1 = 0;
+    }
+
+    if(redraw)
+    {
+        blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
     }
 }

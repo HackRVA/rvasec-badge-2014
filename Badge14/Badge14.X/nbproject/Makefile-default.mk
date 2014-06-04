@@ -45,11 +45,11 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1310178235/uart2.o ${OBJECTDIR}/_ext/659838314/usb_device.o ${OBJECTDIR}/_ext/659838314/usb_function_cdc.o ${OBJECTDIR}/_ext/1360937237/Nokia_5110_Example.o ${OBJECTDIR}/_ext/1360937237/Sound.o ${OBJECTDIR}/_ext/1360937237/badge14.o ${OBJECTDIR}/_ext/1360937237/badge_common.o ${OBJECTDIR}/_ext/1360937237/main.o ${OBJECTDIR}/_ext/1360937237/time_date.o ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o ${OBJECTDIR}/_ext/1360937237/touch.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1310178235/uart2.o.d ${OBJECTDIR}/_ext/659838314/usb_device.o.d ${OBJECTDIR}/_ext/659838314/usb_function_cdc.o.d ${OBJECTDIR}/_ext/1360937237/Nokia_5110_Example.o.d ${OBJECTDIR}/_ext/1360937237/Sound.o.d ${OBJECTDIR}/_ext/1360937237/badge14.o.d ${OBJECTDIR}/_ext/1360937237/badge_common.o.d ${OBJECTDIR}/_ext/1360937237/main.o.d ${OBJECTDIR}/_ext/1360937237/time_date.o.d ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o.d ${OBJECTDIR}/_ext/1360937237/touch.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1310178235/uart2.o ${OBJECTDIR}/_ext/659838314/usb_device.o ${OBJECTDIR}/_ext/659838314/usb_function_cdc.o ${OBJECTDIR}/_ext/1360937237/Nokia_5110_Example.o ${OBJECTDIR}/_ext/1360937237/Sound.o ${OBJECTDIR}/_ext/1360937237/badge14.o ${OBJECTDIR}/_ext/1360937237/badge_common.o ${OBJECTDIR}/_ext/1360937237/main.o ${OBJECTDIR}/_ext/1360937237/time_date.o ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o ${OBJECTDIR}/_ext/1360937237/touch.o ${OBJECTDIR}/_ext/1360937237/timer1_int.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1310178235/uart2.o.d ${OBJECTDIR}/_ext/659838314/usb_device.o.d ${OBJECTDIR}/_ext/659838314/usb_function_cdc.o.d ${OBJECTDIR}/_ext/1360937237/Nokia_5110_Example.o.d ${OBJECTDIR}/_ext/1360937237/Sound.o.d ${OBJECTDIR}/_ext/1360937237/badge14.o.d ${OBJECTDIR}/_ext/1360937237/badge_common.o.d ${OBJECTDIR}/_ext/1360937237/main.o.d ${OBJECTDIR}/_ext/1360937237/time_date.o.d ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o.d ${OBJECTDIR}/_ext/1360937237/touch.o.d ${OBJECTDIR}/_ext/1360937237/timer1_int.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1310178235/uart2.o ${OBJECTDIR}/_ext/659838314/usb_device.o ${OBJECTDIR}/_ext/659838314/usb_function_cdc.o ${OBJECTDIR}/_ext/1360937237/Nokia_5110_Example.o ${OBJECTDIR}/_ext/1360937237/Sound.o ${OBJECTDIR}/_ext/1360937237/badge14.o ${OBJECTDIR}/_ext/1360937237/badge_common.o ${OBJECTDIR}/_ext/1360937237/main.o ${OBJECTDIR}/_ext/1360937237/time_date.o ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o ${OBJECTDIR}/_ext/1360937237/touch.o
+OBJECTFILES=${OBJECTDIR}/_ext/1310178235/uart2.o ${OBJECTDIR}/_ext/659838314/usb_device.o ${OBJECTDIR}/_ext/659838314/usb_function_cdc.o ${OBJECTDIR}/_ext/1360937237/Nokia_5110_Example.o ${OBJECTDIR}/_ext/1360937237/Sound.o ${OBJECTDIR}/_ext/1360937237/badge14.o ${OBJECTDIR}/_ext/1360937237/badge_common.o ${OBJECTDIR}/_ext/1360937237/main.o ${OBJECTDIR}/_ext/1360937237/time_date.o ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o ${OBJECTDIR}/_ext/1360937237/touch.o ${OBJECTDIR}/_ext/1360937237/timer1_int.o
 
 
 CFLAGS=
@@ -147,6 +147,11 @@ ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o: ../src/usb_descriptors.c  nbproj
 	@${RM} ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o.d 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/usb_descriptors.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DPIC32MX460F512L_PIM -DGLCD_DEVICE_PIC24H -DGLCD_CONTROLLER_PCD8544 -DGLCD_USE_SPI -I"../src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1360937237/usb_descriptors.o.d" -o ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o ../src/usb_descriptors.c    -G0
 	
+${OBJECTDIR}/_ext/1360937237/timer1_int.o: ../src/timer1_int.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/timer1_int.o.d 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/timer1_int.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DPIC32MX460F512L_PIM -DGLCD_DEVICE_PIC24H -DGLCD_CONTROLLER_PCD8544 -DGLCD_USE_SPI -I"../src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1360937237/timer1_int.o.d" -o ${OBJECTDIR}/_ext/1360937237/timer1_int.o ../src/timer1_int.c    -G0
+	
 else
 ${OBJECTDIR}/_ext/1310178235/uart2.o: ../src/Common/uart2.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1310178235 
@@ -197,6 +202,11 @@ ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o: ../src/usb_descriptors.c  nbproj
 	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
 	@${RM} ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o.d 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/usb_descriptors.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DPIC32MX460F512L_PIM -DGLCD_DEVICE_PIC24H -DGLCD_CONTROLLER_PCD8544 -DGLCD_USE_SPI -I"../src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1360937237/usb_descriptors.o.d" -o ${OBJECTDIR}/_ext/1360937237/usb_descriptors.o ../src/usb_descriptors.c    -G0
+	
+${OBJECTDIR}/_ext/1360937237/timer1_int.o: ../src/timer1_int.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/timer1_int.o.d 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/timer1_int.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -DPIC32MX460F512L_PIM -DGLCD_DEVICE_PIC24H -DGLCD_CONTROLLER_PCD8544 -DGLCD_USE_SPI -I"../src" -O1 -fschedule-insns -MMD -MF "${OBJECTDIR}/_ext/1360937237/timer1_int.o.d" -o ${OBJECTDIR}/_ext/1360937237/timer1_int.o ../src/timer1_int.c    -G0
 	
 endif
 

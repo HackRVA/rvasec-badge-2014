@@ -52,14 +52,12 @@ struct TouchState
 };
 
 //small queue, it would be nice to make this a linked list, but wtf do I know
+#define QUEUE_SIZE 4
 struct Queue
 {
-    //if we want to simulate OO...i guess
-    //void *(update)(Queue, void *item);
-    void *front;
-    void *mid;
-    void *back;
+    unsigned char q_size;
 
+    unsigned char vals[QUEUE_SIZE];
 };
 
 struct CoOrd
@@ -117,6 +115,12 @@ struct BadgeState
     void* (*slide_handler)(struct TouchQueue *t_queue);
     //void* (*slide_handler)(struct TouchState *t_state);
 
+    void* (*ir_handler)(struct BadgeState* b_state);
+
+    struct Queue ir_incoming, ir_outgoing;
+
+    unsigned int ir_recvd_msg;
+    
     struct TouchQueue slide_states;
    // struct Queue slide_states;
 
@@ -152,6 +156,8 @@ struct BadgeState* Init_Game(void);
 void Run_Game(struct BadgeState **state);
 
 void initQueue(struct Queue *queue);
+unsigned char popQueue(struct Queue *queue);
+unsigned char pushQueue(struct Queue *queue, unsigned char item);
 void updateQueue(struct Queue queue, void *item );
 void initGFX(void);
 void setupMenus(void);
@@ -182,6 +188,7 @@ unsigned char calibrateSide2(struct BadgeState *b_state);
 //don't use as a standalone state
 void* draw_main_ticker(struct BadgeState *b_state);
 void* browse_schedule(struct BadgeState *b_state);
+void* defaultIR(struct BadgeState *b_state);
 
 void* welcome(struct BadgeState *b_state);
 void* main_menu(struct BadgeState *b_state);
@@ -196,6 +203,7 @@ void* tunnelFlight(struct BadgeState *b_state);
 void* image_viewer(struct BadgeState *b_state);
 void* setup_screen_saver(struct BadgeState *b_state);
 void* gogo_screen_saver(struct BadgeState *b_state);
+void* user_ping(struct BadgeState *b_state);
 
 void* debugStage(struct BadgeState *b_state);
 void printTouchVals(unsigned char btm, unsigned char side);

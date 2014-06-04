@@ -54,6 +54,7 @@
       <itemPath>../src/time_date.c</itemPath>
       <itemPath>../src/usb_descriptors.c</itemPath>
       <itemPath>../src/touch.S</itemPath>
+      <itemPath>../src/timer1_int.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
