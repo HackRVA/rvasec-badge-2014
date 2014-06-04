@@ -401,12 +401,13 @@ void setupStates(void)
         ping_state.next_state = &ping_state;
 }
 
-
+extern unsigned char G_IRrecvVal;
+extern unsigned char G_IRsendVal;
+extern unsigned char G_IRsend;
+extern unsigned char G_IRrecv;
+extern unsigned char G_bitCnt;
 struct BadgeState* Init_Game(void)
 {
-//    b_rtccTime tm;
-//    b_rtccDate dt;
-
     LATBbits.LATB7 = 1;
     button_pressed = button_cnt = button_used = 0;
     btm_size = side_size = 0;
@@ -433,6 +434,10 @@ struct BadgeState* Init_Game(void)
     RtccSetTimeDate(start_state.tm.l, start_state.dt.l);
     int TimerInit(void);
     TimerInit();
+        G_IRrecv = 0;
+        G_IRrecvVal = 0;
+        G_IRsend = 0;
+        G_bitCnt = 0;
     //return (struct BadgeState *)&start_state;
     //return &bird_state;
     return &ping_state;
@@ -440,9 +445,6 @@ struct BadgeState* Init_Game(void)
 
 //update clock every T_UPDATE_DELTA iterations
 #define T_UPDATE_DELTA 20000
-extern unsigned char G_IRrecvVal;
-extern unsigned char G_IRsendVal;
-extern unsigned char G_IRsend;
 void Run_Game(struct BadgeState **state)
 {
     static unsigned int cnt = 0;
@@ -456,15 +458,18 @@ void Run_Game(struct BadgeState **state)
     }
 
     //something recieved? Give it to the current state
-    if(G_IRrecvVal)
+    if(G_IRrecv == 2)
     {
-//        pushQueue(&(*state)->ir_incoming, G_IRrecvVal);
-//
-//
-//        //all messages in? Call the handler
-//        if((*state)->ir_incoming.q_size == QUEUE_SIZE)
+        pushQueue(&(*state)->ir_incoming, G_IRrecvVal);
+
+        //all messages in? Call the handler
+        if((*state)->ir_incoming.q_size == QUEUE_SIZE)
             (*state)->ir_handler(*state);
+
+        G_IRrecv = 0;
         G_IRrecvVal = 0;
+        G_IRsend = 0;
+        G_bitCnt = 0;
     }
 
     //state wants to send something?
@@ -481,19 +486,22 @@ void Run_Game(struct BadgeState **state)
 void* defaultIR(struct BadgeState *b_state)
 {
     
-    unsigned char i = 0, chksum = G_IRrecvVal;//b_state->ir_incoming.vals[0];
+    unsigned char i = 0, chksum = 0;//= 0x7F & G_IRrecvVal;//b_state->ir_incoming.vals[0];
     unsigned int temp_in = 0;
-    unsigned char tmp_chars[] = "b";
-    tmp_chars[0] = chksum;
-    //char tmp_chars[QUEUE_SIZE + 1] = {0};
+//    unsigned char tmp_chars[] = "b";
+//    tmp_chars[0] = chksum;
+    char tmp_chars[QUEUE_SIZE + 1] = {0};
     //tmp_chars[QUEUE_SIZE];// = 0;
+    
+    for(i = 0; i < QUEUE_SIZE; i++)
+    {
+        tmp_chars[i] = (popQueue(&b_state->ir_incoming) & 0x7F);
+        chksum ^= tmp_chars[i];
+        temp_in |=  ((unsigned int) tmp_chars[i]) << (24 - (8 * i));
+    }
+    //LCDClear();
+    clear_screen_buff();
     fill_buff(&main_buff, 0x00);
-//    for(i = 0; i < QUEUE_SIZE; i++)
-//    {
-//        tmp_chars[i] = popQueue(&b_state->ir_incoming);
-//        //chksum ^= tmp_chars[i];
-//        temp_in |=  ((unsigned int) tmp_chars[i]) << (24 - (8 * i));
-//    }
 
     //b_state->ir_recvd_msg = b_state->ir_incoming.vals[0];
     buffString(0, 0,
@@ -538,7 +546,7 @@ void* user_ping(struct BadgeState *b_state)
     if ( button_pressed == 250)
     {
         button_pressed++;
-        fill_buff(&main_buff, 0x00);
+        
         G_IRsendVal = 128 | 0x61;
         G_IRsend = 1;
 //        pushQueue(&b_state->ir_outgoing, 'a');
@@ -553,6 +561,8 @@ void* user_ping(struct BadgeState *b_state)
 
     if(redraw)
     {
+        redraw = 0;
+        fill_buff(&main_buff, 0x00);
         //pushQueue(&b_state->ir_outgoing, bt_swipe);
         buffString(24, 0,
                     "SENT",
@@ -562,6 +572,7 @@ void* user_ping(struct BadgeState *b_state)
         //blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
     }
 }
+
 //////////////////////////////
 //PERIPH HANDLERS
 //////////////////////////////

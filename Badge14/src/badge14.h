@@ -51,6 +51,9 @@ struct TouchState
     unsigned char side_slider_right;
 };
 
+#define BROADCAST_LIMIT
+static unsigned char broadcast[];
+
 //small queue, it would be nice to make this a linked list, but wtf do I know
 #define QUEUE_SIZE 4
 struct Queue
@@ -207,6 +210,6 @@ void* user_ping(struct BadgeState *b_state);
 
 void* debugStage(struct BadgeState *b_state);
 void printTouchVals(unsigned char btm, unsigned char side);
-
+void* sendMsg(struct BadgeState *b_state);
 #endif	/* BADGE14_H */
 

@@ -160,9 +160,10 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) Timer2Handler(void)
    // each timer interrupt is 1/38khz
    if (G_IRrecv) {
 	if (G_bitCnt > 7) {
-	   G_IRrecv = 0;
+	   G_IRrecv = 2;
 	   G_bitCnt = 0;
 	   G_halfCount = 0;
+
 	}
 	else {
 	   G_halfCount++;
@@ -170,19 +171,21 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) Timer2Handler(void)
 	   // for 64 total per bit
 	   if (G_halfCount == 16) G_firstHalf = !PORTCbits.RC0; 
 	   if (G_halfCount == 48) G_lastHalf = !PORTCbits.RC0;
-           if (G_firstHalf == G_lastHalf) //check for error
-           {
-               G_IRrecvVal = 0;
-               G_IRrecv = 0;
-               return;
-           }
+
 	   if (G_halfCount > 63) {
 	      G_IRrecvVal <<= 1 ;
 	      G_IRrecvVal |= G_lastHalf; // should check proper manchester low->high, high->low
 	      LATBbits.LATB8 = G_lastHalf; // DBG output
 	      G_bitCnt++;
 	      G_halfCount = 0;
-	   }
+             if (G_firstHalf == G_lastHalf) //check for error
+               {
+                   G_IRrecvVal = 0;
+                   G_IRrecv = 0;
+                   return;
+               }
+           }
+
 	}
 	return;
    }
