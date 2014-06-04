@@ -1878,7 +1878,7 @@ void* draw_main_ticker(struct BadgeState *b_state)
         b_state->big_counter_1 = 0;
 
         //scroll through events
-        if(b_state->counter_2 < NUM_EVENTS - 1)
+        if(b_state->counter_2 < NUM_EVENTS_D1 - 1)
             b_state->counter_2++;
         else
             b_state->counter_2 = 0;
@@ -1946,7 +1946,7 @@ void* draw_main_ticker(struct BadgeState *b_state)
                          &main_buff);
 
         buffString_trunc(0, 28,
-                        conf_events_d1[b_state->counter_2].title,
+                        conf_events_d1[b_state->counter_2].ballroom_title,
                         14,
                         11,
                         "...",
@@ -2021,7 +2021,7 @@ void* browse_schedule(struct BadgeState *b_state)
         b_state->next_state = b_state;
     }
 
-    if(bt_swipe < 0 && b_state->counter_2 < NUM_EVENTS - 1)
+    if(bt_swipe < 0 && b_state->counter_2 < NUM_EVENTS_D2 - 1)
     {
         b_state->counter_2++;
         redraw = 1;
@@ -2062,7 +2062,7 @@ void* browse_schedule(struct BadgeState *b_state)
                     &main_buff);
 
         buffString(0, 14,
-            conf_events_d1[b_state->counter_2].title,
+            conf_events_d1[b_state->counter_2].ballroom_title,
                     &main_buff);
 
         blitBuff_opt(&main_buff, 0, 0);
