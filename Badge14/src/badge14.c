@@ -467,8 +467,8 @@ void Run_Game(struct BadgeState **state)
     {
         pushQueue(&(*state)->ir_incoming, G_IRrecvVal);
 
-        //all messages in? Call the handler
-        if((*state)->ir_incoming.q_size == QUEUE_SIZE)
+        //all messages in and we have a handler? Call the handler
+        if((*state)->ir_incoming.q_size == QUEUE_SIZE && (*state)->ir_handler)
             (*state)->ir_handler(*state);
 
         G_IRrecv = 0;
@@ -493,41 +493,60 @@ void* defaultIR(struct BadgeState *b_state)
     
     unsigned char i = 0, chksum = 0;//= 0x7F & G_IRrecvVal;//b_state->ir_incoming.vals[0];
     unsigned int temp_in = 0;
-//    unsigned char tmp_chars[] = "b";
-//    tmp_chars[0] = chksum;
+
     unsigned char tmp_chars[QUEUE_SIZE + 1] = {0};
-    //tmp_chars[QUEUE_SIZE];// = 0;
-    tmp_chars[0] = b_state->ir_incoming.vals[0] & 0x7F;
-    tmp_chars[1] = b_state->ir_incoming.vals[1] & 0x7F;
-    tmp_chars[2] = b_state->ir_incoming.vals[2] & 0x7F;
-    tmp_chars[3] = b_state->ir_incoming.vals[3] & 0x7F;
+
     for(i = 0; i < QUEUE_SIZE; i++)
     {
-        //tmp_chars[i] =
+        tmp_chars[i] =
                 (popQueue(&b_state->ir_incoming) & 0x7F);
         chksum ^= tmp_chars[i];
+
+        //first char in goes to top
         temp_in |=  ((unsigned int) tmp_chars[i]) << (24 - (8 * i));
     }
     //LCDClear();
     clear_screen_buff();
     fill_buff(&main_buff, 0x00);
 
-    //b_state->ir_recvd_msg = b_state->ir_incoming.vals[0];
-    buffString(0, 0,
-                "GOT SOMETHING:",
-                &main_buff);
+    if(tmp_chars[0] == PING)
+    {
+        buffString(0, 0,
+                    "GOT PING:",
+                    &main_buff);
+        
+    }
+    else if (tmp_chars[0] == PONG)
+    {
+        buffString(0, 0,
+                    "GOT PONG:",
+                    &main_buff);
 
+    }
+    else if (tmp_chars[0] == MSG)
+    {
+        buffString(0, 0,
+                    "GOT MSG:",
+                    &main_buff);
+    }
+    else
+    {
+        //b_state->ir_recvd_msg = b_state->ir_incoming.vals[0];
+        buffString(0, 0,
+                    "GOT SOMETHING:",
+                    &main_buff);
 
-    
-    buffString(10, 10,
-                tmp_chars,
-                &main_buff);
+        buffString( 10, 10,
+                    tmp_chars,
+                    &main_buff);
+    }
 
     set_leds( chksum );
 
     blitBuff_opt(&main_buff, 0, 0);
 }
 
+#define MSG_HOLD 500000
 void* user_ping(struct BadgeState *b_state)
 {
     unsigned char redraw = 0;
@@ -541,57 +560,96 @@ void* user_ping(struct BadgeState *b_state)
     {
         //redraw = 1;
         b_state->counter_1++;
+        b_state->big_counter = 0;
         b_state->next_state = b_state;
+        redraw = 1;
     }
 
-    if(bt_swipe < 0)// && b_state->counter_2 < NUM_IMAGE_ASSETS - 1)
+    if(b_state->big_counter)
     {
-       // b_state->counter_2++;
-       // redraw = 1;
+        b_state->big_counter--;
+        if(!b_state->big_counter)
+        {
+            redraw = 1;
+            //b_state->counter_2++;
+        }
     }
 
-    if(bt_swipe > 0)// && b_state->counter_2 > 0)
-    {
-        //b_state->counter_2--;
-        //redraw = 1;
-    }
-    if ( button_pressed == 250)
+    if(bt_swipe < 0 || button_pressed == 250)// && b_state->counter_2 < NUM_IMAGE_ASSETS - 1)
     {
         button_pressed++;
-        
-//        G_IRsendVal = 128 | 0x61;
-//        G_IRsend = 1;
 
-//        pushQueue(&b_state->ir_outgoing, test[0] | 128);
-//        pushQueue(&b_state->ir_outgoing, test[1] | 128);
-//        pushQueue(&b_state->ir_outgoing, test[2] | 128);
-//        pushQueue(&b_state->ir_outgoing, test[3] | 128);
-        b_state->ir_outgoing.vals[0] = test[0] | 128;
-        b_state->ir_outgoing.vals[1] = test[1] | 128;
-        b_state->ir_outgoing.vals[2] = test[2] | 128;
-        b_state->ir_outgoing.vals[3] = test[3] | 128;
-        b_state->ir_outgoing.q_size = 4;
+        //send the ping out
+        if(!b_state->counter_2)
+        {
+            //fuck it, send it four times
+            pushQueue(&b_state->ir_outgoing, PING | 128);
+            pushQueue(&b_state->ir_outgoing, PING | 128);
+            pushQueue(&b_state->ir_outgoing, PING | 128);
+            pushQueue(&b_state->ir_outgoing, PING | 128);
+            b_state->counter_2++;
+            b_state->big_counter = MSG_HOLD;
+        }
         redraw = 1;
-//        start_state.next_state = &start_state;
-//        b_state->next_state = &start_state;
-//        b_state->counter_1 = 0;
+    }
+
+
+    if ( button_pressed == 250)
+    {
+    }
+
+
+    if( (b_state->ir_recvd_msg >> 24) == PONG)
+    {
+        b_state->counter_2 = 2;
+        b_state->big_counter = MSG_HOLD;
     }
 
     if(redraw)
     {
-        redraw = 0;
         fill_buff(&main_buff, 0x00);
-        //pushQueue(&b_state->ir_outgoing, bt_swipe);
-        buffString(24, 0,
-                    "SENT",
-                    &main_buff);
 
-        buffString(24, 10,
-             test,
-            &main_buff);
+        if(!b_state->counter_2)
+        {
+            //pushQueue(&b_state->ir_outgoing, bt_swipe);
+            buffString(24, 0,
+                        "SWIPE UP TO",
+                        &main_buff);
+            buffString(26, 10,
+                        "SEND PING",
+                        &main_buff);
+        }
+
+        if(b_state->counter_2 == 1)
+        {
+            //pushQueue(&b_state->ir_outgoing, bt_swipe);
+            buffString(24, 0,
+                        "SENT!",
+                        &main_buff);
+        }
+
+        if(b_state->counter_2 == 1 && !b_state->big_counter)
+        {
+            b_state->counter_2 = 0;
+            redraw = 1;
+        }
+
+        if(b_state->counter_2 == 2)
+        {
+            //pushQueue(&b_state->ir_outgoing, bt_swipe);
+            buffString(24, 0,
+                        "GOT PONG!",
+                        &main_buff);
+        }
+
+        if(b_state->counter_2 == 2 && !b_state->big_counter)
+        {
+            b_state->counter_2 = 0;
+            redraw = 1;
+        }
 
         blitBuff_opt(&main_buff, 0, 0);
-        //blitBuff_opt(&screen_images[b_state->counter_2].buff, 0, 0);
+
     }
 }
 

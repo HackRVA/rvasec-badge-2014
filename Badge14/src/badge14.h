@@ -11,6 +11,8 @@
 #include "badge_common.h"
 #include "gfx_assets.h"
 
+enum IR_CODES {NONE, PING, PONG, MSG};
+
 //size of buffers hold possible cap touch vals
 #define SIZE 7
 #define MAX_SIZE 7

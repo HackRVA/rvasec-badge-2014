@@ -450,8 +450,12 @@ void bcdIncrement(unsigned char *num)
     }
 }
 
+//not BCD, just separated into string
 void uINT_to_chars(unsigned int in, char *out)
 {
-    
+    out[0] = (in >>24);
+    out[1] = (in >>16) & 0xf;
+    out[2] = (in >>8) & 0xf;
+    out[3] = (in) & 0xf;
 }
 
