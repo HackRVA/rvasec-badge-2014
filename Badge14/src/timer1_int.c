@@ -173,6 +173,7 @@ void __ISR(_TIMER_2_VECTOR, IPL2SOFT) Timer2Handler(void)
            if (G_firstHalf == G_lastHalf) //check for error
            {
                G_IRrecvVal = 0;
+               G_IRrecv = 0;
                return;
            }
 	   if (G_halfCount > 63) {

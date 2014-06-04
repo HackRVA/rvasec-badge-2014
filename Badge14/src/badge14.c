@@ -105,8 +105,6 @@ void initBadgeState(struct BadgeState *b_state)
 }
 
 
-
-
 //initialize all the things
 struct BadgeState start_state;
 
@@ -433,6 +431,7 @@ struct BadgeState* Init_Game(void)
 
     setupRTCC();
     RtccSetTimeDate(start_state.tm.l, start_state.dt.l);
+    int TimerInit(void);
     TimerInit();
     //return (struct BadgeState *)&start_state;
     //return &bird_state;
