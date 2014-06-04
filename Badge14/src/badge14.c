@@ -931,8 +931,11 @@ void* touchCalibrate(struct BadgeState *b_state)
             str[k+5 ] = 0;
             LCDString(str);
         }
-        if(button_pressed == 5 )
+        if(button_pressed == 250 )
+        {
+            button_pressed++;
             b_state->big_counter = 4;
+        }
     }
     else
     {
@@ -1862,14 +1865,15 @@ void* badgy_bird(struct BadgeState *b_state)
     }
 }
 
-#define MAIN_TICKER_RATE 60000
+#define MAIN_TICKER_RATE 80000
 void* draw_main_ticker(struct BadgeState *b_state)
 {
+    static unsigned char sub_event = 0;
     //static unsigned char ticker_i = 0, cnt;
     
     b_state->big_counter_1++;
 
-    if(b_state->big_counter_1 == MAIN_TICKER_RATE)
+    if(b_state->big_counter_1 == MAIN_TICKER_RATE || b_state->big_counter == 3)
     {
         // tell menu maker to redraw
         b_state->counter_1 = 0;
@@ -1877,11 +1881,16 @@ void* draw_main_ticker(struct BadgeState *b_state)
         //reset counter
         b_state->big_counter_1 = 0;
 
-        //scroll through events
-        if(b_state->counter_2 < NUM_EVENTS_D1 - 1)
-            b_state->counter_2++;
-        else
-            b_state->counter_2 = 0;
+        if(++b_state->big_counter >= 3)
+        {
+            b_state->big_counter = 0;
+            
+            //scroll through events
+            if(b_state->counter_2 < NUM_EVENTS_D1 - 1)
+                b_state->counter_2++;
+            else
+                b_state->counter_2 = 0;
+        }
     }
 
     //may result in duplicate redraws... w/e
@@ -1904,36 +1913,7 @@ void* draw_main_ticker(struct BadgeState *b_state)
             start_time,
                     &main_buff);
 
-//        buffString(48, 39,
-//            end_time,
-//                    &main_buff);
-
-//        now_time[0] = hextab[((current_time.hour >>  4) & 0xF)];
-//        now_time[1] = hextab[(current_time.hour      ) & 0xF];
-//        now_time[2] = ':';
-//        now_time[3] = hextab[(current_time.min >>  4) & 0xF];
-//        now_time[4] = hextab[(current_time.min      ) & 0xF];
-//        now_time[5] = '.';
-//        now_time[6] = hextab[(current_time.sec >>  4) & 0xF];
-//        now_time[7] = hextab[(current_time.sec      ) & 0xF];
-
-//        now_time[0] = 48 + ((current_time.hour >>  4) & 0xF);
-//        now_time[1] = 48 + ((current_time.hour      ) & 0xF);
-//        now_time[2] = ':';
-//        now_time[3] = 48 + ((current_time.min >>  4) & 0xF);
-//        now_time[4] = 48 + ((current_time.min      ) & 0xF);
-
         setTimeString(b_state->tm, now_time);
-//        now_time[0] = 48 + ((b_state->tm.hour >>  4) & 0xF);
-//        now_time[1] = 48 + ((b_state->tm.hour      ) & 0xF);
-//        now_time[2] = ':';
-//        now_time[3] = 48 + ((b_state->tm.min >>  4) & 0xF);
-//        now_time[4] = 48 + ((b_state->tm.min      ) & 0xF);
-
-
-//        now_time[5] = '.';
-//        now_time[6] = 48 + ((current_time.sec >>  4) & 0xF);
-//        now_time[7] = 48 + ((current_time.sec      ) & 0xF);
 
         buffString(48, 39,
                     now_time,
@@ -1945,12 +1925,38 @@ void* draw_main_ticker(struct BadgeState *b_state)
                          11,
                          &main_buff);
 
-        buffString_trunc(0, 28,
-                        conf_events_d1[b_state->counter_2].ballroom_title,
-                        14,
-                        11,
-                        "...",
-                    &main_buff);
+        if(!b_state->big_counter)
+        {
+            buffString_trunc(0, 28,
+                            conf_events_d1[b_state->counter_2].ballroom_title,
+                            14,
+                            11,
+                            "...",
+                        &main_buff);
+        }
+        else if (b_state->big_counter == 1 && conf_events_d1[b_state->counter_2].salon_title[0])
+        {
+            buffString_trunc(0, 28,
+                conf_events_d1[b_state->counter_2].salon_title,
+                14,
+                11,
+                "...",
+            &main_buff);
+        }
+        else if (b_state->big_counter == 2 && conf_events_d1[b_state->counter_2].other_title[0])
+        {
+            buffString_trunc(0, 28,
+                conf_events_d1[b_state->counter_2].other_title,
+                14,
+                11,
+                "...",
+            &main_buff);
+        }
+        else //sub events are empty, move on
+        {
+            b_state->big_counter = 3;
+            //b_state->big_counter_1 == MAIN_TICKER_RATE - 1;
+        }
     }
 }
 
@@ -2019,6 +2025,7 @@ void* browse_schedule(struct BadgeState *b_state)
         redraw = 1;
         b_state->counter_1++;
         b_state->next_state = b_state;
+        b_state->big_counter = 0;
     }
 
     if(bt_swipe < 0 && b_state->counter_2 < NUM_EVENTS_D2 - 1)
@@ -2032,6 +2039,19 @@ void* browse_schedule(struct BadgeState *b_state)
         b_state->counter_2--;
         redraw = 1;
     }
+    
+    if(lr_swipe > 0 && b_state->big_counter < 2)
+    {
+        b_state->big_counter++;
+        redraw = 1;
+    }
+
+    if(lr_swipe < 0 && b_state->big_counter > 0)
+    {
+        b_state->big_counter--;
+        redraw = 1;
+    }
+
     if ( button_pressed == 250)
     {
         button_pressed++;
@@ -2045,26 +2065,55 @@ void* browse_schedule(struct BadgeState *b_state)
     {
         struct coord loc;
         loc.x = 0;
-        loc.y = 0;
+        loc.y = 9;
         char start_time[5], end_time[5];
         fill_buff(&main_buff, 0x00);
         intTime_to_charTime(start_time, conf_events_d1[b_state->counter_2].start_time);
         intTime_to_charTime(end_time, conf_events_d1[b_state->counter_2].end_time);
 
-        draw_square(&main_buff, loc, 83, 11);
+        draw_square(&main_buff, loc, 83, 9);
 
-        buffString(1, 2,
+        buffString(1, 11,
                     start_time,
                     &main_buff);
 
-        buffString(48, 2,
+        buffString(48, 11,
                     end_time,
                     &main_buff);
 
-        buffString(0, 14,
-            conf_events_d1[b_state->counter_2].ballroom_title,
-                    &main_buff);
+        if(b_state->big_counter == 0)
+        {
+            buffString(22, 0,
+                        "Ballroom",
+                        &main_buff);
 
+            buffString(0, 20,
+                conf_events_d1[b_state->counter_2].ballroom_title,
+                        &main_buff);
+        }
+
+        else if(b_state->big_counter == 1)
+        {
+            buffString(24, 0,
+                        "Salons",
+                        &main_buff);
+
+            buffString(0, 20,
+                conf_events_d1[b_state->counter_2].salon_title,
+                        &main_buff);
+        }
+
+        else if(b_state->big_counter == 2)
+        {
+            buffString(24, 0,
+                "Other",
+                &main_buff);
+
+            buffString(0, 20,
+                conf_events_d1[b_state->counter_2].other_title,
+                        &main_buff);
+        }
+        
         blitBuff_opt(&main_buff, 0, 0);
     }
 }

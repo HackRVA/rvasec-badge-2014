@@ -85,7 +85,7 @@ void init_d1(void)
     conf_events_d1[i].end_time = 120000;
     b_strcpy(conf_events_d1[i].other_title, "\0");
     b_strcpy(conf_events_d1[i].salon_title, "\0");
-    b_strcpy(conf_events_d1[i++].ballroom_title, "Kizz MyAnthia");
+    b_strcpy(conf_events_d1[i++].ballroom_title, "Jayson E. Street");
 
     //12:00	1:00	Lunch
     conf_events_d1[i].start_time = 120000;
@@ -211,115 +211,112 @@ void init_d2(void)
     //8:00	6:00	Registration
     conf_events_d2[i].start_time = 80000;
     conf_events_d2[i].end_time = 60000;
-    b_strcpy(conf_events_d1[i].other_title, "\0");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "\0");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Registration");
 
     //8:00	8:50	Breakfast sponsored by TruShield Security!
     conf_events_d2[i].start_time = 80000;
     conf_events_d2[i].end_time = 85000;
-    b_strcpy(conf_events_d1[i].other_title, "\0");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "\0");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Breakfast");
 
     //8:50	9:00	Welcome
     conf_events_d2[i].start_time = 85000;
     conf_events_d2[i].end_time = 90000;
-    b_strcpy(conf_events_d1[i].other_title, "\0");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "\0");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Welcome");
 
     //9:00	10:00	Gene Fishel
     conf_events_d2[i].start_time = 90000;
     conf_events_d2[i].end_time = 100000;
-    b_strcpy(conf_events_d1[i].other_title, "\0");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "\0");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Gene Fishel (Keynote)");
 
     //10:00	10:10	Break 	 	CTF
     conf_events_d2[i].start_time = 100000;
     conf_events_d2[i].end_time = 101000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Break");
 
     //10:10	11:00	Evan Booth
     //Terminal Cornucopia: Demystifying the Mullet	  	CTF
     conf_events_d2[i].start_time = 101000;
     conf_events_d2[i].end_time = 110000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Evan Booth");
 
     //11:00	11:10	Break 	 	CTF
     conf_events_d2[i].start_time = 110000;
     conf_events_d2[i].end_time = 111000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Break");
 
     //11:10	12:00	Jonathan Dambrot
     conf_events_d2[i].start_time = 111000;
     conf_events_d2[i].end_time = 120000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "Steve Werby");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "Steve Werby");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Jonathan Dambrot");
 
     conf_events_d2[i].start_time = 120000;
     conf_events_d2[i].end_time = 10000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Lunch");
-
-
-
 
     conf_events_d2[i].start_time = 10000;
     conf_events_d2[i].end_time = 15000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "Ray Kelly");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "Ray Kelly");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Carmen & Kimberley");
 
     conf_events_d2[i].start_time = 15000;
     conf_events_d2[i].end_time = 20000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Break");
 
     conf_events_d2[i].start_time = 20000;
     conf_events_d2[i].end_time = 25000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "David J. Bianco");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "David J. Bianco");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Dan Holden & Elizabeth Martin");
 
     conf_events_d2[i].start_time = 25000;
     conf_events_d2[i].end_time = 31000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Break");
 
     conf_events_d2[i].start_time = 31000;
     conf_events_d2[i].end_time = 40000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "Joey Peloquin");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "Joey Peloquin");
     b_strcpy(conf_events_d2[i++].ballroom_title, "David Sharpe & Katherine Trame");
 
     conf_events_d2[i].start_time = 40000;
     conf_events_d2[i].end_time = 41000;
-    b_strcpy(conf_events_d1[i].other_title, "CTF!");
-    b_strcpy(conf_events_d1[i].salon_title, "");
+    b_strcpy(conf_events_d2[i].other_title, "CTF!");
+    b_strcpy(conf_events_d2[i].salon_title, "");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Break");
 
     conf_events_d2[i].start_time = 41000;
     conf_events_d2[i].end_time = 50000;
-    b_strcpy(conf_events_d1[i].other_title, "\0");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "\0");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Pete Herzog");
 
     conf_events_d2[i].start_time = 50000;
     conf_events_d2[i].end_time = 63000;
-    b_strcpy(conf_events_d1[i].other_title, "\0");
-    b_strcpy(conf_events_d1[i].salon_title, "\0");
+    b_strcpy(conf_events_d2[i].other_title, "\0");
+    b_strcpy(conf_events_d2[i].salon_title, "\0");
     b_strcpy(conf_events_d2[i++].ballroom_title, "Reception at VCU");
 }
 /*
