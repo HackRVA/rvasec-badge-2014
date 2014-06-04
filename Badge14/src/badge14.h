@@ -11,7 +11,9 @@
 #include "badge_common.h"
 #include "gfx_assets.h"
 
-enum IR_CODES {NONE, PING, PONG, MSG};
+#define PING 0x0f
+#define PONG 0x0e
+#define MSG 0x0d
 
 //size of buffers hold possible cap touch vals
 #define SIZE 7
@@ -199,6 +201,8 @@ void* welcome(struct BadgeState *b_state);
 void* main_menu(struct BadgeState *b_state);
 void* menu_maker(struct BadgeState *b_state);
 void* manual_contrast(struct BadgeState *b_state);
+void zeroStateCounters(struct BadgeState* b_state);
+void* auto_contrast(struct BadgeState *b_state);
 void* adjust_time(struct BadgeState *b_state);
 
 void* sliderPlay(struct BadgeState *b_state);

@@ -13,6 +13,15 @@ struct pix_buff main_buff, bird_idle_buff;
 unsigned char max_lower_left, max_lower_right,
         max_side_left, max_side_right;
 
+
+void zeroStateCounters(struct BadgeState* b_state)
+{
+    b_state->big_counter = 0;
+    b_state->big_counter_1 = 0;
+    b_state->counter_1 = 0;
+    b_state->counter_2 = 0;
+}
+
 void initTouchState(struct TouchState *t_state)
 {
     t_state->lr_swipe = 0;
@@ -361,7 +370,7 @@ void setupStates(void)
 {
     initBadgeState(&start_state);
         start_state.next_state = &start_state;
-        start_state.state_handler = touchCalibrate;//main_menu;//tunnelFlight; // //
+        start_state.state_handler = auto_contrast; //touchCalibrate;//main_menu;//tunnelFlight; // //
         start_state.slide_handler = autoSlide;
         
     initBadgeState(&sketch_state);
@@ -443,9 +452,9 @@ struct BadgeState* Init_Game(void)
         G_IRrecvVal = 0;
         G_IRsend = 0;
         G_bitCnt = 0;
-    //return (struct BadgeState *)&start_state;
+    return (struct BadgeState *)&start_state;
     //return &bird_state;
-    return &ping_state;
+    //return &ping_state;
 }
 
 //update clock every T_UPDATE_DELTA iterations
@@ -1210,6 +1219,12 @@ void* touchCalibrate(struct BadgeState *b_state)
         {
             button_pressed++;
             b_state->big_counter = 4;
+            b_state->big_counter
+                = b_state->counter_1
+                = b_state->counter_2
+                = b_state->big_counter_1 = 0;
+            current_menu = &main_page;
+            b_state->state_handler = menu_maker;//main_menu;//welcome;
         }
     }
     else
@@ -1217,10 +1232,7 @@ void* touchCalibrate(struct BadgeState *b_state)
 //        LCDClear();
 //        LCDLogo();
 
-        b_state->big_counter
-            = b_state->counter_1
-            = b_state->counter_2 = 0;
-        b_state->state_handler = menu_maker;//main_menu;//welcome;
+
     }
 }
 
@@ -1331,7 +1343,11 @@ void* welcome(struct BadgeState *b_state)
 
     else
     {
-        if(b_state->counter_2 == 15)
+        if(!b_state->counter_2)
+        {
+            LCDLogo();
+        }
+        else if(b_state->counter_2 == 15)
         {
             LCDClear();
             LCD_RVASec_Logo();
@@ -1345,13 +1361,15 @@ void* welcome(struct BadgeState *b_state)
 
     if(b_state->counter_2 == 30 || button_pressed == 250)
     {
+        set_leds(0x00);
+        button_pressed++;
         //LCDLogo();
         LCDClear();
         LCDInit();
         b_state->big_counter = 0;
         b_state->counter_2 = 0;
         b_state->counter_1 = 0;
-        b_state->state_handler = sliderPlay;
+        b_state->state_handler = touchCalibrate;
 
     }
     return 0;
@@ -1560,6 +1578,78 @@ void* menu_maker(struct BadgeState *b_state)
         current_menu->extra_func(b_state);
     }
 
+}
+
+#define RATE 10000
+#define MIN_CONTRAST 120
+#define MAX_CONTRAST 195
+void* auto_contrast(struct BadgeState *b_state)
+{
+    unsigned char redraw = 0;
+    // init
+    if(!b_state->counter_1)
+    {
+        b_state->counter_1 = 1;
+        b_state->counter_2 = 0;
+        b_state->big_counter = 0;
+        b_state->big_counter_1 = 0;
+        gContrast = 175;
+        LCDInit();
+    }
+
+    if(!b_state->big_counter_1--)
+    {
+        redraw = 1;
+        b_state->big_counter_1 = RATE;
+
+        //increasing contrast
+        if(!b_state->counter_2)
+        {
+            if(gContrast < MAX_CONTRAST)
+            {
+                gContrast++;
+                LCDInit();
+            }
+            else// start decreasing back down
+                b_state->counter_2 = 1;
+        }
+        else
+        {
+            if(gContrast > MIN_CONTRAST)
+            {
+                gContrast--;
+                LCDInit();
+            }
+            else// start decreasing back down
+                b_state->counter_2 = 0;
+        }
+    }
+    
+    if(redraw)
+    {
+        buffString(0, 0,
+                    "Press BTN when\n    this is\n   legible!",
+                    &main_buff);
+
+
+        blitBuff_opt(&main_buff, 0, 0);
+    }
+
+    if ( button_pressed == 250 )
+    {
+
+        LCDClear();
+        fill_buff(&main_buff, 0x00);
+
+        current_menu = &settings_page;
+        start_state.next_state = &start_state;
+        b_state->next_state = &start_state;
+        b_state->state_handler = welcome;
+        zeroStateCounters(b_state);
+        button_pressed++;
+        return;
+
+    }
 }
 
 void* manual_contrast(struct BadgeState *b_state)
@@ -2246,6 +2336,7 @@ void printTouchVals(unsigned char btm, unsigned char side)
 
     if(btm)
     {
+        char help_msg[] = "Swipe L -> R";
         utoa(val, (unsigned) G_lower_slider_left, 10);
 
         LCDString(val);
@@ -2257,6 +2348,12 @@ void printTouchVals(unsigned char btm, unsigned char side)
 
         utoa(val, (unsigned) G_lower_slider_right, 10);
         LCDString(val);
+
+        val[0] = '\n';
+        val[1] = '\n';
+        val[2] = 0;
+        LCDString(val);
+        LCDString(help_msg);
     }
 
     if(btm && side)
@@ -2271,6 +2368,9 @@ void printTouchVals(unsigned char btm, unsigned char side)
     //LCDClear();
     if (side)
     {
+        char help_msg1[] = "\n          T\n";
+        char help_msg3[] = "   Swipe  ^\n";
+        char help_msg4[] = "          B\n";
         utoa(val, (unsigned) G_side_slider_left, 10);
 
         //side left
@@ -2285,6 +2385,16 @@ void printTouchVals(unsigned char btm, unsigned char side)
         //side right
         utoa(val, (unsigned) G_side_slider_right, 10);
         LCDString(val);
+
+        //seperator
+//        val[0] = '\n ';
+//        val[1] = 0;
+//        val[2] = 0;
+//        LCDString(val);
+        LCDString(help_msg1);
+        //LCDString(help_msg2);
+        LCDString(help_msg3);
+        LCDString(help_msg4);
     }
 }
 
