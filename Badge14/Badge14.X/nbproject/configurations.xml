@@ -21,6 +21,7 @@
       <itemPath>../src/nokia.h</itemPath>
       <itemPath>../src/rvasec_logo.h</itemPath>
       <itemPath>../src/schedule.h</itemPath>
+      <itemPath>../src/gfx_assets.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -75,7 +76,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>1.21</languageToolchainVersion>
+        <languageToolchainVersion>1.31</languageToolchainVersion>
         <platform>2</platform>
       </toolsSet>
       <compileType>
@@ -290,10 +291,11 @@
         <property key="preprocessor-macros" value=""/>
         <property key="remove-unused-sections" value="false"/>
         <property key="report-memory-usage" value="false"/>
-        <property key="stack-size" value="1024"/>
+        <property key="stack-size" value="2048"/>
         <property key="symbol-stripping" value=""/>
         <property key="trace-symbols" value=""/>
         <property key="warn-section-align" value="false"/>
+        <appendMe value="-G0"/>
       </C32-LD>
       <C32CPP>
         <property key="additional-warnings" value="false"/>
@@ -323,6 +325,7 @@
       <C32Global>
         <property key="legacy-libc" value="false"/>
         <property key="save-temps" value="false"/>
+        <property key="wpo-lto" value="false"/>
       </C32Global>
       <PICkit3PlatformTool>
         <property key="ADC 1" value="true"/>
@@ -379,6 +382,7 @@
         <property key="programoptions.preserveprogramrange.end" value="0x1d01ffff"/>
         <property key="programoptions.preserveprogramrange.start" value="0x1d000000"/>
         <property key="programoptions.preserveuserid" value="false"/>
+        <property key="programoptions.testmodeentrymethod" value="VPPFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
         <property key="voltagevalue" value="3.25"/>

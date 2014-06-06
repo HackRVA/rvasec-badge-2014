@@ -205,6 +205,182 @@ void initGFX(void)
     screen_images[i].buff.pixels = stache;
     screen_images[i].buff.height = 48;
     screen_images[i].buff.width = 84;
+
+    i++;
+
+    //grumpy cat
+    screen_images[i].name = batman_txt;
+    screen_images[i].buff.pixels = batman;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+    i++;
+
+    //grumpy cat
+    screen_images[i].name = biohazard_txt;
+    screen_images[i].buff.pixels = bioHazard;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+    i++;
+
+    //grumpy cat
+    screen_images[i].name = fawkes_txt;
+    screen_images[i].buff.pixels = fawkes;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+        i++;
+
+    //grumpy cat
+    screen_images[i].name = heartbleed_txt;
+    screen_images[i].buff.pixels = heartbleed;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+        i++;
+
+    //grumpy cat
+    screen_images[i].name = honeypot_txt;
+    screen_images[i].buff.pixels = honeyPot;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+
+        i++;
+
+    //grumpy cat
+    screen_images[i].name = ironman_txt;
+    screen_images[i].buff.pixels = ironman;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+        i++;
+
+    //grumpy cat
+    screen_images[i].name = kali_txt;
+    screen_images[i].buff.pixels = kali;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+            i++;
+
+    //grumpy cat
+    screen_images[i].name = metasploit_txt;
+    screen_images[i].buff.pixels = metasploit;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+     i++;
+
+    //grumpy cat
+    screen_images[i].name = nmap_txt;
+    screen_images[i].buff.pixels = nmap;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+     i++;
+
+    //grumpy cat
+    screen_images[i].name = nuke2_txt;
+    screen_images[i].buff.pixels = nuke2;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+         i++;
+
+    //grumpy cat
+    screen_images[i].name = nuke_txt;
+    screen_images[i].buff.pixels = nuke;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+         i++;
+
+    //grumpy cat
+    screen_images[i].name = offensive_txt;
+    screen_images[i].buff.pixels = offensive;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+         i++;
+
+    //grumpy cat
+    screen_images[i].name = ohw_txt;
+    screen_images[i].buff.pixels = oHardware;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+         i++;
+
+    //grumpy cat
+    screen_images[i].name = peace_txt;
+    screen_images[i].buff.pixels = peace;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+         i++;
+
+    //grumpy cat
+    screen_images[i].name = rick_txt;
+    screen_images[i].buff.pixels = rick;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+         i++;
+
+    //grumpy cat
+    screen_images[i].name = rvasec_txt;
+    screen_images[i].buff.pixels = rvaSec;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+         i++;
+
+    screen_images[i].name = smiley_txt;
+    screen_images[i].buff.pixels = smiley;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+         i++;
+
+    screen_images[i].name = superman_txt;
+    screen_images[i].buff.pixels = superMan;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+             i++;
+
+    screen_images[i].name = supersec_txt;
+    screen_images[i].buff.pixels = superRvaSec;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+    
+     i++;
+
+    screen_images[i].name = wireshark_txt;
+    screen_images[i].buff.pixels = wireshark;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;  
+    
+     i++;
+
+    screen_images[i].name = xzibit_txt;
+    screen_images[i].buff.pixels = xzibit;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+     i++;
+
+    screen_images[i].name = yuno_txt;
+    screen_images[i].buff.pixels = YUNO1;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
+
+     i++;
+
+    screen_images[i].name = skullxbones_txt;
+    screen_images[i].buff.pixels = skullxbones;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
 }
 
 void setupMenus(void)
@@ -280,7 +456,7 @@ void setupMenus(void)
     more_game_entries[1] = &ping_e;
         ping_e.text = ping_txt;
         ping_e.menu_entry = 0;
-        ping_e.state_entry = &ping_state;
+        ping_e.state_entry = 0;//&ping_state;
         
     more_game_entries[2] = &back_to_games;
         back_to_games.text = go_back;
@@ -370,7 +546,7 @@ void setupStates(void)
 {
     initBadgeState(&start_state);
         start_state.next_state = &start_state;
-        start_state.state_handler = menu_maker;//touchCalibrate;//main_menu;//tunnelFlight; //auto_contrast; // //
+        start_state.state_handler = auto_contrast; //menu_maker;//touchCalibrate;//main_menu;//tunnelFlight; // //
         start_state.slide_handler = autoSlide;
         
     initBadgeState(&sketch_state);
@@ -469,33 +645,33 @@ void Run_Game(struct BadgeState **state)
     *state = (*state)->next_state;
 
     //don't need to update too often
-    if( cnt++ == T_UPDATE_DELTA)
-    {
-        cnt = 0;
-        (*state)->tm.l = get_time();
-    }
+//    if( cnt++ == T_UPDATE_DELTA)
+//    {
+//        cnt = 0;
+//        (*state)->tm.l = get_time();
+//    }
+//
+//    //something recieved? Give it to the current state
+//    if(G_IRrecv == 2)
+//    {
+//        pushQueue(&(*state)->ir_incoming, G_IRrecvVal);
+//
+//        //all messages in and we have a handler? Call the handler
+//        if((*state)->ir_incoming.q_size == QUEUE_SIZE && (*state)->ir_handler)
+//            (*state)->ir_handler(*state);
+//
+//        G_IRrecv = 0;
+//        G_IRrecvVal = 0;
+//        G_IRsend = 0;
+//        G_bitCnt = 0;
+//    }
 
-    //something recieved? Give it to the current state
-    if(G_IRrecv == 2)
-    {
-        pushQueue(&(*state)->ir_incoming, G_IRrecvVal);
-
-        //all messages in and we have a handler? Call the handler
-        if((*state)->ir_incoming.q_size == QUEUE_SIZE && (*state)->ir_handler)
-            (*state)->ir_handler(*state);
-
-        G_IRrecv = 0;
-        G_IRrecvVal = 0;
-        G_IRsend = 0;
-        G_bitCnt = 0;
-    }
-
-    //state wants to send something?
-    if((*state)->ir_outgoing.q_size && !G_IRsend)// && !G_IRsendVal)
-    {
-        G_IRsendVal = popQueue(&(*state)->ir_outgoing);
-        G_IRsend = 1;
-    }
+//    //state wants to send something?
+//    if((*state)->ir_outgoing.q_size && !G_IRsend)// && !G_IRsendVal)
+//    {
+//        G_IRsendVal = popQueue(&(*state)->ir_outgoing);
+//        G_IRsend = 1;
+//    }
 
     //run the state
     (*state)->state_handler(*state);
@@ -1585,9 +1761,9 @@ void* menu_maker(struct BadgeState *b_state)
 
 }
 
-#define RATE 10000
+#define RATE 4000
 #define MIN_CONTRAST 120
-#define MAX_CONTRAST 195
+#define MAX_CONTRAST 190
 void* auto_contrast(struct BadgeState *b_state)
 {
     unsigned char redraw = 0;
@@ -1598,7 +1774,7 @@ void* auto_contrast(struct BadgeState *b_state)
         b_state->counter_2 = 0;
         b_state->big_counter = 0;
         b_state->big_counter_1 = 0;
-        gContrast = 175;
+        gContrast = 170;
         LCDInit();
     }
 
@@ -1632,6 +1808,7 @@ void* auto_contrast(struct BadgeState *b_state)
     
     if(redraw)
     {
+        fill_buff(&main_buff, 0x00);
         buffString(0, 0,
                     "Press BTN when\n    this is\n   legible!",
                     &main_buff);
@@ -1825,6 +2002,9 @@ void* sliderPlay(struct BadgeState *b_state)
     else if ( button_pressed == 250 )
     {
         LCDClear();
+//        start_state.next_state = &start_state;
+//        b_state->next_state = &start_state;
+//        b_state->counter_2 = 0;
     }
     
     if(b_state->slide_states.bottom_hold_count > DEBOUNCE)
@@ -2034,11 +2214,11 @@ void* badgy_bird(struct BadgeState *b_state)
     struct coord loc;
     //static struct coord pipe_locs[MAX_PIPES];
 
-    b_state->slide_handler(&b_state->slide_states);
-
-    //set_leds(b_state->slide_states.front.lower_loc);
-    char lr_swipe = b_state->slide_states.front.lr_swipe;
-    char bt_swipe = b_state->slide_states.front.bt_swipe;
+//    b_state->slide_handler(&b_state->slide_states);
+//
+//    //set_leds(b_state->slide_states.front.lower_loc);
+//    char lr_swipe = b_state->slide_states.front.lr_swipe;
+//    char bt_swipe = b_state->slide_states.front.bt_swipe;
 
     //initialize things
     if(!b_state->counter_2)
@@ -2128,9 +2308,16 @@ void* badgy_bird(struct BadgeState *b_state)
              //hit floor or pipe, enter start screen after this draw
              if(collision)
              {
+
                 b_state->counter_2 = 0;
                 b_state->counter_1 = 0;
-                b_state->big_counter = 0;     
+                b_state->big_counter = 0;
+                b_state->big_counter_1 = 0;
+                fill_buff(&main_buff, 0x00);
+                start_state.next_state = &start_state;
+                b_state->next_state = &start_state;
+                b_state->counter_1 = 0;
+                return;
              }
 
             //flapping bird, apply flap accel
@@ -2702,7 +2889,9 @@ void* setup_screen_saver(struct BadgeState *b_state)
             b_state->counter_2++;
     }
 
-    if(bt_swipe < 0 && b_state->counter_2 < NUM_IMAGE_ASSETS)
+    if(bt_swipe < 0 
+            && b_state->counter_2 < NUM_IMAGE_ASSETS
+            && b_state->counter_2 < 10)
     {
         b_state->counter_2++;
         redraw = 1;
