@@ -863,7 +863,7 @@ void* basicSlide(struct TouchQueue *t_queue)
         //make sure no change happens
         t_queue->front.lr_swipe = 0;
         sample_counter++;
-        return;
+        return NULL;
     }
     sample_counter = 0;
 
@@ -907,7 +907,7 @@ void* autoSlide(struct TouchQueue *t_queue)
         t_queue->front.lr_swipe = 0;
         t_queue->front.bt_swipe = 0;
         sample_counter++;
-        return;
+        return NULL;
     }
     sample_counter = 0;
 
@@ -1018,7 +1018,7 @@ void* superSlide(struct TouchQueue *t_queue)
         t_queue->front.lr_swipe = 0;
         t_queue->front.bt_swipe = 0;
         sample_counter++;
-        return;
+        return NULL;
     }
     sample_counter = 0;
 
@@ -1686,14 +1686,14 @@ void* menu_maker(struct BadgeState *b_state)
         {
             current_menu
                     = current_menu->entries[current_menu->selected]->menu_entry;
-            return;
+            return NULL;
         }
         else if ( current_menu->entries[current_menu->selected]->state_entry )
         {
             b_state->next_state
                     = current_menu->entries[current_menu->selected]->state_entry;
             
-            return;
+            return NULL;
         }
     }
 
@@ -1829,7 +1829,7 @@ void* auto_contrast(struct BadgeState *b_state)
         b_state->state_handler = welcome;
         //zeroStateCounters(b_state);
         button_pressed++;
-        return;
+        return NULL;
 
     }
 }
@@ -1883,7 +1883,7 @@ void* manual_contrast(struct BadgeState *b_state)
             b_state->next_state = &start_state;
             redraw = 1;
             button_pressed++;
-            return;
+            return NULL;
         }
     }
 
@@ -2317,7 +2317,7 @@ void* badgy_bird(struct BadgeState *b_state)
                 start_state.next_state = &start_state;
                 b_state->next_state = &start_state;
                 b_state->counter_1 = 0;
-                return;
+                return NULL;
              }
 
             //flapping bird, apply flap accel
@@ -2939,7 +2939,7 @@ void* setup_screen_saver(struct BadgeState *b_state)
                 start_state.next_state = &start_state;
                 b_state->next_state = &start_state;
                 b_state->counter_1 = 0;
-                return;
+                return NULL;
             }
         }
     }
@@ -3102,7 +3102,7 @@ void* adjust_backlight_slider(struct BadgeState *b_state)
         b_state->next_state = &start_state;
         redraw = 1;
         button_pressed++;
-        return;
+        return NULL;
 
     }
 
@@ -3183,7 +3183,7 @@ void* adjust_backlight(struct BadgeState *b_state)
         
         redraw = 1;
         button_pressed++;
-        return;
+        return NULL;
 
     }
 
