@@ -381,6 +381,13 @@ void initGFX(void)
     screen_images[i].buff.pixels = skullxbones;
     screen_images[i].buff.height = 48;
     screen_images[i].buff.width = 84;
+
+     i++;
+
+    screen_images[i].name = rva_maker_txt;
+    screen_images[i].buff.pixels = rva_maker;
+    screen_images[i].buff.height = 48;
+    screen_images[i].buff.width = 84;
 }
 
 void setupMenus(void)
@@ -2890,8 +2897,8 @@ void* setup_screen_saver(struct BadgeState *b_state)
     }
 
     if(bt_swipe < 0 
-            && b_state->counter_2 < NUM_IMAGE_ASSETS
-            && b_state->counter_2 < 10)
+            && b_state->counter_2 < NUM_IMAGE_ASSETS)
+            //&& b_state->counter_2 < 10)
     {
         b_state->counter_2++;
         redraw = 1;
